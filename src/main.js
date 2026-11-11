@@ -1,5 +1,5 @@
 
-import { renderNavbar } from "./components/navbar.js";
+import { renderNavbar, initializeNavbar } from "./components/navbar.js";
 
 import {
     renderMovieBanner,
@@ -16,7 +16,6 @@ import { initializeSearchFilters } from "./components/searchResults.js";
 import { initializeMovieCards } from "./components/movieCard.js";
 
 import { renderFooter } from "./components/footer.js";
-import { addToWatchlist } from "./storage/storageService.js";
 
 import {
     trendingMovies,
@@ -28,36 +27,49 @@ import {
 const app = document.getElementById("app");
 
 const allMovies = [
-    ...trendingMovies,
-    ...popularMovies,
-    ...topRatedMovies,
-    ...upcomingMovies
+    ...new Map([
+        ...trendingMovies,
+        ...popularMovies,
+        ...topRatedMovies,
+        ...upcomingMovies
+    ].map(movie => [movie.id, movie])).values()
 ];
 
 function renderApp() {
+
     app.innerHTML = `
-    ${renderNavbar()}
+        <div class="w-full min-h-screen overflow-x-hidden">
 
-    <main>
-        <div id="homeContent">
-            ${renderMovieBanner()}
+            ${renderNavbar()}
+
+            <main class="w-full">
+
+                <div id="homeContent" class="w-full">
+                    ${renderMovieBanner()}
+                </div>
+
+                <div class="w-full px-3 sm:px-5 md:px-8">
+                    ${renderSearchBar()}
+                </div>
+
+                <div id="searchResults" class="w-full px-3 sm:px-5 md:px-8"></div>
+
+                <div id="homeSections" class="w-full">
+                    ${renderMovieSection("Trending Movies", trendingMovies)}
+                    ${renderMovieSection("Popular Movies", popularMovies)}
+                    ${renderMovieSection("Top Rated Movies", topRatedMovies)}
+                    ${renderMovieSection("Upcoming Movies", upcomingMovies)}
+                </div>
+
+            </main>
+
+            ${renderFooter()}
+
         </div>
-
-        ${renderSearchBar()}
-
-        <div id="searchResults"></div>
-
-        <div id="homeSections">
-            ${renderMovieSection("Trending Movies", trendingMovies)}
-            ${renderMovieSection("Popular Movies", popularMovies)}
-            ${renderMovieSection("Top Rated Movies", topRatedMovies)}
-            ${renderMovieSection("Upcoming Movies", upcomingMovies)}
-        </div>
-    </main>
-
-    ${renderFooter()}
-`;
-
+    `;
+// Initialize navbar first
+    initializeNavbar();
+    
     initializeMovieBanner();
     initializeSearchFilters(allMovies);
     initializeMovieSections();

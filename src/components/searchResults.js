@@ -1,3 +1,4 @@
+
 import { renderMovieCard } from "./movieCard.js";
 
 export function searchMovies(movies) {
@@ -7,15 +8,19 @@ export function searchMovies(movies) {
     const ratingFilter = document.getElementById("ratingFilter");
     const sortFilter = document.getElementById("sortFilter");
 
-    const searchInput = document.getElementById("movieSearch");
-    const searchText = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const desktopSearch = document.getElementById("movieSearch");
+    const mobileSearch = document.getElementById("mobileMovieSearch");
+
+    const searchText = (
+        desktopSearch?.value || mobileSearch?.value || ""
+    ).toLowerCase().trim();
 
     const selectedGenre = genreFilter.value;
     const selectedYear = yearFilter.value;
     const selectedRating = ratingFilter.value;
 
-    // Show or hide homepage content
     const homeContent = document.getElementById("homeContent");
+    const homeSections = document.getElementById("homeSections");
     const resultsContainer = document.getElementById("searchResults");
 
     const isSearching =
@@ -26,6 +31,7 @@ export function searchMovies(movies) {
         sortFilter.value !== "";
 
     homeContent.style.display = isSearching ? "none" : "block";
+    homeSections.style.display = isSearching ? "none" : "block";
 
     if (!isSearching) {
         resultsContainer.innerHTML = "";
@@ -34,31 +40,21 @@ export function searchMovies(movies) {
 
     let filteredMovies = [];
 
-    // Filter movies
     for (let i = 0; i < movies.length; i++) {
 
         const movie = movies[i];
 
-        if (searchText && !movie.title.toLowerCase().includes(searchText)) {
-            continue;
-        }
+        if (searchText && !movie.title.toLowerCase().includes(searchText)) continue;
 
-        if (selectedGenre !== "" && movie.genre !== selectedGenre) {
-            continue;
-        }
+        if (selectedGenre !== "" && movie.genre !== selectedGenre) continue;
 
-        if (selectedYear !== "" && movie.year != selectedYear) {
-            continue;
-        }
+        if (selectedYear !== "" && movie.year != selectedYear) continue;
 
-        if (selectedRating !== "" && movie.rating < Number(selectedRating)) {
-            continue;
-        }
+        if (selectedRating !== "" && movie.rating < Number(selectedRating)) continue;
 
         filteredMovies.push(movie);
     }
 
-    // Sort movies
     if (sortFilter.value === "rating") {
         filteredMovies.sort((a, b) => b.rating - a.rating);
     }
@@ -71,7 +67,6 @@ export function searchMovies(movies) {
         filteredMovies.sort((a, b) => b.year - a.year);
     }
 
-    // Display movies
     if (filteredMovies.length === 0) {
         resultsContainer.innerHTML = `
             <p class="text-gray-400 text-center py-10">
@@ -101,16 +96,31 @@ export function initializeSearchFilters(movies) {
     );
 
     filters.forEach(filter => {
-        filter.addEventListener("change", function () {
-            searchMovies(movies);
-        });
+        filter.addEventListener("change", () => searchMovies(movies));
     });
 
-    const searchInput = document.getElementById("movieSearch");
+    const desktopSearch = document.getElementById("movieSearch");
+    const mobileSearch = document.getElementById("mobileMovieSearch");
 
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            searchMovies(movies);
-        });
+    function handleSearch(event) {
+
+        // Keep both search inputs synchronized
+        if (event.target === desktopSearch && mobileSearch) {
+            mobileSearch.value = desktopSearch.value;
+        }
+
+        if (event.target === mobileSearch && desktopSearch) {
+            desktopSearch.value = mobileSearch.value;
+        }
+
+        searchMovies(movies);
+    }
+
+    if (desktopSearch) {
+        desktopSearch.addEventListener("input", handleSearch);
+    }
+
+    if (mobileSearch) {
+        mobileSearch.addEventListener("input", handleSearch);
     }
 }

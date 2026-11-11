@@ -3,41 +3,220 @@ export function renderNavbar() {
     return `
         <nav class="sticky top-0 z-50 bg-gray-900 px-4 md:px-8 py-4">
 
-            <div class="flex items-center justify-between">
+            <div class="relative flex items-center justify-between gap-3">
 
-                <a href="#" class="text-2xl font-bold text-red-500">
+                <!-- Logo -->
+                <a href="index.html" class="text-2xl font-bold text-red-500 shrink-0">
                     CineScope
                 </a>
 
+                <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center gap-8 text-gray-300">
-                    <a href="#" class="hover:text-red-500">Home</a>
-                    <a href="watchlist.html" class="hover:text-red-500">Watchlist</a>
-                    <a href="#" class="hover:text-red-500">Compare</a>
+                    <a href="index.html" class="hover:text-red-500 transition">Home</a>
+                    <a href="watchlist.html" class="hover:text-red-500 transition">Watchlist</a>
+                    <a href="#" class="hover:text-red-500 transition">Compare</a>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <!-- Desktop Search -->
+                <div class="hidden md:flex items-center gap-3">
                     <input
-    type="text"
-    id="movieSearch"
-    placeholder="Search movies..."
-    class="bg-gray-800 text-white px-4 py-2 rounded-lg"
-/>
+                        type="text"
+                        id="movieSearch"
+                        placeholder="Search movies..."
+                        class="w-48 lg:w-56 bg-gray-800 text-white px-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-red-500"
+                    >
 
+                    <img
+                        src="https://i.pravatar.cc/101"
+                        alt="Profile"
+                        class="w-10 h-10 rounded-full object-cover"
+                    >
+                </div>
+
+                <!-- Mobile Actions -->
+                <div class="flex md:hidden items-center gap-2">
+
+                    <!-- Search Button -->
                     <button
-    id="profileBtn"
-    class="w-10 h-10 rounded-full bg-red-600 text-white font-bold flex items-center justify-center hover:bg-red-700"
-    title="Profile"
->
-    <img
-    src="https://i.pravatar.cc/101"
-    alt="Profile"
-    class="w-10 h-10 rounded-full object-cover cursor-pointer"
-/>
-</button>
+                        id="mobileSearchBtn"
+                        class="text-white p-2"
+                        type="button"
+                        aria-expanded="false"
+                        aria-label="Search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="22" height="22"
+                            viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="m20 20-4-4"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Hamburger -->
+                    <button
+                        id="menuBtn"
+                        class="text-white p-2"
+                        type="button"
+                        aria-expanded="false"
+                        aria-label="Menu"
+                    >
+                        <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg"
+                            width="25" height="25"
+                            viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round">
+                            <path d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+
                 </div>
 
             </div>
 
+            <!-- Mobile Search Overlay -->
+            <div
+                id="mobileSearchContainer"
+                class="absolute top-full right-4 z-50 w-56 overflow-hidden bg-gray-900 rounded-lg shadow-xl transition-all duration-300 ease-in-out"
+                style="max-height: 0; opacity: 0; visibility: hidden;"
+            >
+                <div class="p-3">
+                    <input
+                        type="text"
+                        id="mobileMovieSearch"
+                        placeholder="Search movies..."
+                        class="w-full bg-gray-800 text-white px-3 py-2 text-sm rounded-lg outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div
+                id="mobileMenu"
+                class="absolute top-full left-0 z-40 w-full overflow-hidden bg-gray-900 shadow-xl transition-all duration-300 ease-in-out"
+                style="max-height: 0; opacity: 0; visibility: hidden;"
+            >
+                <div class="flex flex-col gap-5 px-6 py-5 text-gray-300">
+
+                    <a href="index.html" class="hover:text-red-500 transition">
+                        Home
+                    </a>
+
+                    <a href="watchlist.html" class="hover:text-red-500 transition">
+                        Watchlist
+                    </a>
+
+                    <a href="#" class="hover:text-red-500 transition">
+                        Compare
+                    </a>
+
+                    <div class="border-t border-gray-700 pt-4">
+                        <img
+                            src="https://i.pravatar.cc/101"
+                            alt="Profile"
+                            class="w-10 h-10 rounded-full object-cover"
+                        >
+                    </div>
+
+                </div>
+            </div>
+
         </nav>
     `;
+}
+
+
+export function initializeNavbar() {
+
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const menuIcon = document.getElementById("menuIcon");
+
+    const searchBtn = document.getElementById("mobileSearchBtn");
+    const searchContainer = document.getElementById("mobileSearchContainer");
+    const mobileSearch = document.getElementById("mobileMovieSearch");
+    const desktopSearch = document.getElementById("movieSearch");
+
+    // Hamburger Menu
+    menuBtn?.addEventListener("click", () => {
+
+        const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+
+        // Close search when menu opens
+        searchContainer.style.maxHeight = "0px";
+        searchContainer.style.opacity = "0";
+        searchContainer.style.visibility = "hidden";
+        searchBtn.setAttribute("aria-expanded", "false");
+
+        if (isOpen) {
+            mobileMenu.style.maxHeight = "0px";
+            mobileMenu.style.opacity = "0";
+            mobileMenu.style.visibility = "hidden";
+
+            menuBtn.setAttribute("aria-expanded", "false");
+
+            menuIcon.innerHTML =
+                '<path d="M4 6h16M4 12h16M4 18h16"></path>';
+
+        } else {
+            mobileMenu.style.visibility = "visible";
+            mobileMenu.style.maxHeight = mobileMenu.scrollHeight + "px";
+            mobileMenu.style.opacity = "1";
+
+            menuBtn.setAttribute("aria-expanded", "true");
+
+            menuIcon.innerHTML =
+                '<path d="m18 6-12 12M6 6l12 12"></path>';
+        }
+
+    });
+
+    // Mobile Search
+    searchBtn?.addEventListener("click", () => {
+
+        const isOpen = searchBtn.getAttribute("aria-expanded") === "true";
+
+        // Close menu when search opens
+        mobileMenu.style.maxHeight = "0px";
+        mobileMenu.style.opacity = "0";
+        mobileMenu.style.visibility = "hidden";
+        menuBtn.setAttribute("aria-expanded", "false");
+
+        menuIcon.innerHTML =
+            '<path d="M4 6h16M4 12h16M4 18h16"></path>';
+
+        if (isOpen) {
+
+            searchContainer.style.maxHeight = "0px";
+            searchContainer.style.opacity = "0";
+            searchContainer.style.visibility = "hidden";
+
+            searchBtn.setAttribute("aria-expanded", "false");
+
+        } else {
+
+            searchContainer.style.visibility = "visible";
+            searchContainer.style.maxHeight = "70px";
+            searchContainer.style.opacity = "1";
+
+            searchBtn.setAttribute("aria-expanded", "true");
+
+            mobileSearch.focus();
+        }
+
+    });
+
+    // Synchronize Search Inputs
+    if (desktopSearch && mobileSearch) {
+
+        desktopSearch.addEventListener("input", () => {
+            mobileSearch.value = desktopSearch.value;
+        });
+
+        mobileSearch.addEventListener("input", () => {
+            desktopSearch.value = mobileSearch.value;
+        });
+
+    }
 }
