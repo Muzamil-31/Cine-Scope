@@ -10,12 +10,21 @@ export function renderSearchBar(genres = [], movies = []) {
         )
     ].sort((a, b) => Number(b) - Number(a));
 
+    const selectClass = `
+        bg-gray-100 dark:bg-gray-900
+        text-gray-900 dark:text-white
+        border border-gray-300 dark:border-gray-700
+        p-3 rounded-lg
+        outline-none
+        focus:ring-2 focus:ring-red-500
+    `;
+
     return `
         <section class="p-5">
 
             <div class="flex flex-wrap gap-3">
 
-                <select id="genreFilter" class="bg-gray-900 p-3 rounded-lg">
+                <select id="genreFilter" class="${selectClass}">
                     <option value="">All Genres</option>
 
                     ${genres.map(genre => `
@@ -26,7 +35,7 @@ export function renderSearchBar(genres = [], movies = []) {
 
                 </select>
 
-                <select id="yearFilter" class="bg-gray-900 p-3 rounded-lg">
+                <select id="yearFilter" class="${selectClass}">
                     <option value="">All Years</option>
 
                     ${years.map(year => `
@@ -35,14 +44,14 @@ export function renderSearchBar(genres = [], movies = []) {
 
                 </select>
 
-                <select id="ratingFilter" class="bg-gray-900 p-3 rounded-lg">
+                <select id="ratingFilter" class="${selectClass}">
                     <option value="">All Ratings</option>
                     <option value="7">7+</option>
                     <option value="8">8+</option>
                     <option value="9">9+</option>
                 </select>
 
-                <select id="sortFilter" class="bg-gray-900 p-3 rounded-lg">
+                <select id="sortFilter" class="${selectClass}">
                     <option value="">Default</option>
                     <option value="rating">Highest Rating</option>
                     <option value="popularity">Most Popular</option>

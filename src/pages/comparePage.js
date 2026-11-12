@@ -17,31 +17,32 @@ const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
 // Render the comparison page
 function renderPage() {
     app.innerHTML = `
-        <div class="max-w-6xl mx-auto px-5 py-10">
+        <main class="bg-gray-950 text-white min-h-screen">
 
-            <a href="index.html"
-                class="text-gray-400 hover:text-white">
-                ← Back to Home
-            </a>
+            <div class="max-w-6xl mx-auto px-5 py-10">
 
-            <h1 class="text-3xl font-bold text-center mt-6 mb-3">
-                Movie Comparison
-            </h1>
+                <a href="index.html"
+                    class="text-gray-400 hover:text-white">
+                    ← Back to Home
+                </a>
 
-            <p class="text-gray-400 text-center mb-10">
-                Select two movies and compare their details.
-            </p>
+                <h1 class="text-3xl font-bold text-center mt-6 mb-3">
+                    Movie Comparison
+                </h1>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <p class="text-gray-400 text-center mb-10">
+                    Select two movies and compare their details.
+                </p>
 
-                ${renderMovieSelector(0)}
-                ${renderMovieSelector(1)}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${renderMovieSelector(0)}
+                    ${renderMovieSelector(1)}
+                </div>
+
+                <div id="comparisonResult" class="mt-10"></div>
 
             </div>
-
-            <div id="comparisonResult" class="mt-10"></div>
-
-        </div>
+        </main>
     `;
 
     initializeSearch();
@@ -50,7 +51,7 @@ function renderPage() {
 // Render one movie selector
 function renderMovieSelector(index) {
     return `
-        <div class="bg-gray-900 p-5 rounded-xl">
+        <div class="bg-gray-900 border border-gray-800 p-5 rounded-xl">
 
             <h2 class="text-xl font-semibold mb-4">
                 Movie ${index + 1}
@@ -60,7 +61,7 @@ function renderMovieSelector(index) {
                 type="text"
                 id="movieSearch${index}"
                 placeholder="Search movie title..."
-                class="w-full p-3 rounded-lg bg-gray-800 outline-none"
+                class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 border border-gray-700 outline-none focus:border-red-500"
                 autocomplete="off"
             >
 
@@ -101,7 +102,7 @@ function initializeSearch() {
                         type="button"
                         data-movie-id="${movie.id}"
                         data-index="${i}"
-                        class="w-full text-left p-3 bg-gray-800 hover:bg-gray-700 rounded-lg">
+                        class="w-full text-left p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition">
                         ${movie.title}
                         <span class="text-gray-400 text-sm">
                             (${movie.release_date?.slice(0, 4) || "N/A"})
@@ -143,22 +144,28 @@ async function handleMovieSelection(event) {
 
     document.getElementById(`selectedMovie${index}`).innerHTML = `
         <div class="flex gap-4 items-center">
+
             <img
                 src="${movie.poster_path ? IMAGE_URL + movie.poster_path : NO_POSTER_URL}"
                 alt="${movie.title}"
                 class="w-20 rounded-lg"
             >
+
             <div>
                 <h3 class="font-semibold">${movie.title}</h3>
+
                 <p class="text-gray-400 text-sm">
                     ${movie.release_date?.slice(0, 4) || "N/A"}
                 </p>
             </div>
+
         </div>
     `;
 
     if (selectedMovies[0] && selectedMovies[1]) {
         await compareMovies();
+    } else {
+        document.getElementById("comparisonResult").innerHTML = "";
     }
 }
 
@@ -167,7 +174,9 @@ async function compareMovies() {
     const result = document.getElementById("comparisonResult");
 
     result.innerHTML = `
-        <p class="text-center text-gray-400">Loading comparison...</p>
+        <p class="text-center text-gray-400">
+            Loading comparison...
+        </p>
     `;
 
     try {
@@ -228,7 +237,7 @@ function renderComparison(movie1, movie2) {
 
                 <tbody>
                     ${rows.map(row => `
-                        <tr class="border-t border-gray-800">
+                        <tr class="border-t border-gray-800 hover:bg-gray-900/70">
                             <td class="p-4 font-semibold">${row[0]}</td>
                             <td class="p-4 text-gray-300">${row[1]}</td>
                             <td class="p-4 text-gray-300">${row[2]}</td>
@@ -246,9 +255,11 @@ function renderComparison(movie1, movie2) {
 async function initializeComparison() {
     try {
         app.innerHTML = `
-            <p class="text-center text-gray-400 p-10">
-                Loading movies...
-            </p>
+            <main class="bg-gray-950 text-white min-h-screen">
+                <p class="text-center text-gray-400 p-10">
+                    Loading movies...
+                </p>
+            </main>
         `;
 
         const [popular, trending] = await Promise.all([
@@ -268,9 +279,11 @@ async function initializeComparison() {
         console.error("Movie Loading Error:", error);
 
         app.innerHTML = `
-            <p class="text-center text-red-400 p-10">
-                Failed to load movies. Please refresh the page.
-            </p>
+            <main class="bg-gray-950 text-white min-h-screen">
+                <p class="text-center text-red-400 p-10">
+                    Failed to load movies. Please refresh the page.
+                </p>
+            </main>
         `;
     }
 }

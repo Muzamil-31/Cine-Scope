@@ -15,9 +15,7 @@ const params = new URLSearchParams(window.location.search);
 const movieId = params.get("id");
 
 async function renderMovieDetails() {
-
     try {
-
         if (!movieId) {
             throw new Error("Movie ID not found");
         }
@@ -33,7 +31,7 @@ async function renderMovieDetails() {
         // Save recently viewed movie
         addRecentlyViewed(movie);
 
-        // Combine similar and recommended movies
+        // Combine similar and recommended movies without duplicates
         const relatedMovies = [
             ...new Map([
                 ...similarMovies,
@@ -46,15 +44,15 @@ async function renderMovieDetails() {
         const genres = movie.genres || [];
 
         app.innerHTML = `
-            <main class="bg-gray-950 text-white min-h-screen">
+            <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
 
                 <!-- Backdrop -->
                 <section
-                    class="relative min-h-[550px] bg-cover bg-top"
+                    class="relative min-h-[550px] bg-gray-950 bg-cover bg-top text-white"
                     style="background-image: url('${movie.backdrop_path ? BACKDROP_URL + movie.backdrop_path : ""}')"
                 >
 
-                    <div class="absolute inset-0 bg-gradient-to-r from-gray-850 via-gray-950/80 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/80 to-transparent"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent"></div>
 
                     <div class="relative max-w-7xl mx-auto px-6 py-12">
@@ -103,7 +101,7 @@ async function renderMovieDetails() {
 
                                 <button
                                     id="addWatchlist"
-                                    class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg mt-7"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg mt-7"
                                 >
                                     + Add to Watchlist
                                 </button>
@@ -124,46 +122,43 @@ async function renderMovieDetails() {
 
                         ${cast.length > 0
                             ? cast.slice(0, 10).map(actor => `
-                                <div class="bg-gray-900 rounded-lg p-4 w-40">
+                                <div class="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 w-40">
 
                                     <h3 class="font-semibold">
                                         ${actor.name}
                                     </h3>
 
-                                    <p class="text-sm text-gray-400 mt-2">
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                                         ${actor.character || ""}
                                     </p>
 
                                 </div>
                             `).join("")
-                            : `<p class="text-gray-400">Cast information not available.</p>`
+                            : `<p class="text-gray-500 dark:text-gray-400">Cast information not available.</p>`
                         }
 
                     </div>
                 </section>
 
-               
-<!-- Similar and Recommended Movies -->
-<section class="max-w-7xl mx-auto px-6 pb-16">
+                <!-- Similar and Recommended Movies -->
+                <section class="max-w-7xl mx-auto px-6 pb-16">
 
-    <h2 class="text-2xl font-bold mb-6">
-        Similar & Recommended Movies
-    </h2>
+                    <h2 class="text-2xl font-bold mb-6">
+                        Similar & Recommended Movies
+                    </h2>
 
-    ${relatedMovies.length > 0
-        ? renderMovieGrid(relatedMovies)
-        : `<p class="text-gray-400">No similar movies available.</p>`
-    }
+                    ${relatedMovies.length > 0
+                        ? renderMovieGrid(relatedMovies)
+                        : `<p class="text-gray-500 dark:text-gray-400">No similar movies available.</p>`
+                    }
 
-</section>
-
+                </section>
 
             </main>
         `;
 
         // Add movie to watchlist
         document.getElementById("addWatchlist").addEventListener("click", () => {
-
             const result = addToWatchlist(movie);
 
             if (result === "added") {
@@ -173,30 +168,32 @@ async function renderMovieDetails() {
             } else {
                 alert("Could not save the movie to your watchlist.");
             }
-
         });
 
     } catch (error) {
-
         console.error("Movie Details Error:", error);
-        const errorMessage = error.message === "Invalid movie ID." ||
+
+        const errorMessage =
+            error.message === "Invalid movie ID." ||
             error.message === "Movie ID not found"
-            ? "The movie ID is invalid or missing."
-            : "Please check your internet connection and try again.";
+                ? "The movie ID is invalid or missing."
+                : "Please check your internet connection and try again.";
 
         app.innerHTML = `
-            <div class="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center">
+            <div class="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white flex flex-col items-center justify-center">
+
                 <h2 class="text-3xl font-bold mb-3">
                     Unable to load movie
                 </h2>
 
-                <p class="text-gray-400">
+                <p class="text-gray-600 dark:text-gray-400">
                     ${errorMessage}
                 </p>
 
-                <a href="index.html" class="bg-red-600 px-5 py-2 rounded-lg mt-5">
+                <a href="index.html" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg mt-5">
                     Back to Home
                 </a>
+
             </div>
         `;
     }
@@ -204,13 +201,11 @@ async function renderMovieDetails() {
 
 // Navigate to similar movie details
 document.addEventListener("click", event => {
-
     const card = event.target.closest("[data-movie-id]");
 
     if (card) {
         window.location.href = `details.html?id=${card.dataset.movieId}`;
     }
-
 });
 
 renderMovieDetails();

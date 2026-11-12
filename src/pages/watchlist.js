@@ -1,5 +1,5 @@
 
-import { renderMovieGrid } from "../components/movieGrid.js";
+import { renderMovieCard } from "../components/movieCard.js";
 
 import {
     getWatchlist,
@@ -9,91 +9,113 @@ import {
 
 const app = document.getElementById("app");
 
-function renderWatchlist() {
+// Force dark mode on this page
+document.documentElement.classList.add("dark");
 
+function renderWatchlist() {
     const movies = getWatchlist();
 
     const unwatchedMovies = movies.filter(movie => !movie.watched);
     const watchedMovies = movies.filter(movie => movie.watched);
 
     app.innerHTML = `
-        <main class="p-5">
+        <main class="bg-gray-950 text-white min-h-screen p-5">
 
-            <a href="index.html" class="text-red-500">
-                ← Back to Home
-            </a>
+            <div class="max-w-7xl mx-auto">
 
-            <h1 class="text-3xl font-bold my-6">
-                My Watchlist
-            </h1>
+                <a href="index.html" class="text-red-500 hover:text-red-400">
+                    ← Back to Home
+                </a>
 
-            <!-- Unwatched Movies -->
-            <section class="mb-10">
+                <h1 class="text-3xl font-bold my-6">
+                    My Watchlist
+                </h1>
 
-                <h2 class="text-2xl font-bold mb-5">
-                    Unwatched Movies (${unwatchedMovies.length})
-                </h2>
+                <!-- Unwatched Movies -->
+                <section class="mb-12">
 
-                ${unwatchedMovies.length > 0
-                    ? renderMovieGrid(unwatchedMovies)
-                    : '<p class="text-gray-400">No unwatched movies.</p>'
-                }
+                    <h2 class="text-2xl font-bold mb-6">
+                        Unwatched Movies (${unwatchedMovies.length})
+                    </h2>
 
-                <div class="flex flex-wrap gap-3 mt-4">
-                    ${unwatchedMovies.map(movie => `
-                        <div class="flex gap-2">
-                            <button
-                                data-action="watched"
-                                data-id="${movie.id}"
-                                class="bg-green-600 px-3 py-2 rounded">
-                                Mark Watched
-                            </button>
+                    ${unwatchedMovies.length > 0
+                        ? `
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
 
-                            <button
-                                data-action="remove"
-                                data-id="${movie.id}"
-                                class="bg-red-600 px-3 py-2 rounded">
-                                Remove
-                            </button>
-                        </div>
-                    `).join("")}
-                </div>
+                                ${unwatchedMovies.map(movie => `
+                                    <div class="min-w-0">
 
-            </section>
+                                        ${renderMovieCard(movie)}
 
-            <!-- Watched Movies -->
-            <section>
+                                       <div class="grid grid-cols-2 gap-2 mt-3">
+    <button
+        data-action="unwatched"
+        data-id="${movie.id}"
+        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
+        Mark Unwatched
+    </button>
 
-                <h2 class="text-2xl font-bold mb-5">
-                    Watched Movies (${watchedMovies.length})
-                </h2>
+    <button
+        data-action="remove"
+        data-id="${movie.id}"
+        class="w-full bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
+        Remove
+    </button>
+</div>
 
-                ${watchedMovies.length > 0
-                    ? renderMovieGrid(watchedMovies)
-                    : '<p class="text-gray-400">No watched movies.</p>'
-                }
+                                    </div>
+                                `).join("")}
 
-                <div class="flex flex-wrap gap-3 mt-4">
-                    ${watchedMovies.map(movie => `
-                        <div class="flex gap-2">
-                            <button
-                                data-action="unwatched"
-                                data-id="${movie.id}"
-                                class="bg-yellow-600 px-3 py-2 rounded">
-                                Mark Unwatched
-                            </button>
+                            </div>
+                        `
+                        : '<p class="text-gray-400">No unwatched movies.</p>'
+                    }
 
-                            <button
-                                data-action="remove"
-                                data-id="${movie.id}"
-                                class="bg-red-600 px-3 py-2 rounded">
-                                Remove
-                            </button>
-                        </div>
-                    `).join("")}
-                </div>
+                </section>
 
-            </section>
+                <!-- Watched Movies -->
+                <section>
+
+                    <h2 class="text-2xl font-bold mb-6">
+                        Watched Movies (${watchedMovies.length})
+                    </h2>
+
+                    ${watchedMovies.length > 0
+                        ? `
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+
+                                ${watchedMovies.map(movie => `
+                                    <div class="min-w-0">
+
+                                        ${renderMovieCard(movie)}
+
+<div class="grid grid-cols-2 gap-2 mt-3">
+    <button
+        data-action="unwatched"
+        data-id="${movie.id}"
+        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
+        Mark Unwatched
+    </button>
+
+    <button
+        data-action="remove"
+        data-id="${movie.id}"
+        class="w-full bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
+        Remove
+    </button>
+</div>
+
+                                    </div>
+                                `).join("")}
+
+                            </div>
+                        `
+                        : '<p class="text-gray-400">No watched movies.</p>'
+                    }
+
+                </section>
+
+            </div>
 
         </main>
     `;
@@ -101,7 +123,6 @@ function renderWatchlist() {
 
 // Handle watchlist actions
 app.addEventListener("click", event => {
-
     const button = event.target.closest("[data-action]");
 
     if (!button) return;

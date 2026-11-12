@@ -1,4 +1,3 @@
-
 export function renderError() {
     return `
         <div class="text-center py-10">

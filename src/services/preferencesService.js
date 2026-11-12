@@ -1,4 +1,3 @@
-
 const STORAGE_KEY = "cinescope_preferences";
 
 const DEFAULT_PREFERENCES = {
@@ -114,4 +113,29 @@ export function saveTheme(theme) {
 // Get saved theme
 export function getTheme() {
     return getPreferences().theme;
+}
+
+ // Toggle between dark and light themes
+export function toggleTheme() {
+    const newTheme = getTheme() === "dark" ? "light" : "dark";
+
+    saveTheme(newTheme);
+
+    document.documentElement.classList.toggle(
+        "dark",
+        newTheme === "dark"
+    );
+
+    return newTheme;
+}
+
+export function initializeTheme() {
+    const theme = getTheme();
+
+    document.documentElement.classList.toggle(
+        "dark",
+        theme === "dark"
+    );
+
+    return theme;
 }

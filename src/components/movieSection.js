@@ -10,14 +10,14 @@ export function renderMovieSection(title, movies = []) {
     }
 
     return `
-        <section class="px-5 md:px-8 py-6">
+        <section class="px-5 md:px-8 py-6 text-gray-900 dark:text-white">
 
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">${title}</h2>
 
                 <div class="flex gap-2">
                     <button
-                        class="scrollLeft bg-gray-800 hover:bg-red-600 p-2 rounded-full"
+                        class="scrollLeft bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-red-600 hover:text-white p-2 rounded-full transition"
                         aria-label="Scroll left"
                         type="button"
                     >
@@ -25,7 +25,7 @@ export function renderMovieSection(title, movies = []) {
                     </button>
 
                     <button
-                        class="scrollRight bg-gray-800 hover:bg-red-600 p-2 rounded-full"
+                        class="scrollRight bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-red-600 hover:text-white p-2 rounded-full transition"
                         aria-label="Scroll right"
                         type="button"
                     >
@@ -43,7 +43,6 @@ export function renderMovieSection(title, movies = []) {
         </section>
     `;
 }
-
 
 export function initializeMovieSections() {
 

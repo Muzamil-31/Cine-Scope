@@ -1,4 +1,3 @@
-
 import { renderMovieCard } from "./movieCard.js";
 
 export function renderMovieGrid(movies = []) {

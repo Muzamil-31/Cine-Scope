@@ -1,4 +1,3 @@
-
 import { renderMovieCard } from "./movieCard.js";
 
 const IMAGE_URL = "https://image.tmdb.org/t/p/";

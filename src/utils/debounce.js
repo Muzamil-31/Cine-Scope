@@ -1,4 +1,3 @@
-
 export function debounce(callback, delay) {
     let timer;
 

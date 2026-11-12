@@ -1,6 +1,5 @@
-
 import { renderNavbar, initializeNavbar } from "./components/navbar.js";
-
+import { initializeTheme } from "./services/preferencesService.js";
 import {
     renderMovieBanner,
     initializeMovieBanner
@@ -120,12 +119,12 @@ async function renderApp() {
             </div>
         `;
 
-        // Initialize event listeners
-        initializeNavbar();
-        initializeMovieBanner();
-        initializeSearchFilters(getState().allMovies);
-        initializeMovieSections();
-        initializeMovieCards(getState().allMovies);
+       // Initialize event listeners
+            initializeNavbar();
+            initializeMovieBanner();
+            initializeSearchFilters(getState().allMovies);
+            initializeMovieSections();
+            initializeMovieCards(getState().allMovies);
 
     } catch (error) {
 

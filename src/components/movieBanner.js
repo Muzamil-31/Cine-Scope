@@ -1,4 +1,3 @@
-
 const IMAGE_URL = "https://image.tmdb.org/t/p/original";
 
 export function renderMovieBanner(movies, genres = []) {
@@ -6,7 +5,7 @@ export function renderMovieBanner(movies, genres = []) {
     const bannerMovies = movies.slice(0, 5);
 
     return `
-       <section class="relative w-full h-[450px] sm:h-[520px] md:h-[750px] overflow-hidden">
+        <section class="relative w-full h-[450px] sm:h-[520px] md:h-[750px] overflow-hidden bg-gray-950">
 
             <div
                 id="bannerTrack"
@@ -18,6 +17,7 @@ export function renderMovieBanner(movies, genres = []) {
                     const year = movie.release_date
                         ? movie.release_date.split("-")[0]
                         : "N/A";
+
                     const runtime = Number.isFinite(movie.runtime) && movie.runtime > 0
                         ? `${movie.runtime} min`
                         : "N/A";
@@ -29,17 +29,17 @@ export function renderMovieBanner(movies, genres = []) {
 
                     return `
                         <div
-                            class="relative min-w-full h-full bg-cover bg-top flex items-end"
+                            class="relative min-w-full h-full bg-cover bg-top flex items-end text-white"
                             style="
-                               background-image:
-    linear-gradient(
-        to top,
-        rgba(3, 7, 18, 0.85) 0%,
-        rgba(3, 7, 18, 0.35) 25%,
-        rgba(3, 7, 18, 0.10) 55%,
-        transparent 100%
-    ),
-    url('${movie.backdrop_path ? IMAGE_URL + movie.backdrop_path : ""}');
+                                background-image:
+                                    linear-gradient(
+                                        to top,
+                                        rgba(3, 7, 18, 0.95) 0%,
+                                        rgba(3, 7, 18, 0.65) 35%,
+                                        rgba(3, 7, 18, 0.25) 65%,
+                                        rgba(3, 7, 18, 0.10) 100%
+                                    ),
+                                    url('${movie.backdrop_path ? IMAGE_URL + movie.backdrop_path : ""}');
                             "
                         >
 
@@ -51,29 +51,35 @@ export function renderMovieBanner(movies, genres = []) {
                                         ${movie.title}
                                     </h2>
 
-                                    <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-300 mb-3">
+                                    <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-200 mb-3">
                                         <span>${year}</span>
                                         <span>•</span>
                                         <span>${runtime}</span>
                                         <span>•</span>
-                                        <span>Ratings ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+                                        <span>Rating ${movie.vote_average?.toFixed(1) || "N/A"}</span>
                                     </div>
 
                                     <p class="text-red-400 text-sm font-semibold mb-3">
                                         ${movieGenres || "Movie"}
                                     </p>
 
-                                    <p class="text-sm sm:text-base text-gray-300 mb-5 sm:mb-6 leading-relaxed line-clamp-3">
-                                        ${movie.overview}
+                                    <p class="text-sm sm:text-base text-gray-200 mb-5 sm:mb-6 leading-relaxed line-clamp-3">
+                                        ${movie.overview || "No description available."}
                                     </p>
 
                                     <div class="flex flex-wrap gap-3">
 
-                                        <button class="bg-red-600 hover:bg-red-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg">
+                                        <button
+                                            type="button"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition"
+                                        >
                                             Watch Now
                                         </button>
 
-                                        <button class="bg-gray-700 hover:bg-gray-600 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg">
+                                        <button
+                                            type="button"
+                                            class="bg-white/20 hover:bg-white/30 text-white border border-white/30 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition"
+                                        >
                                             More Info
                                         </button>
 

@@ -1,21 +1,19 @@
-
 import { renderMovieGrid } from "./movieGrid.js";
 import { getMoviesByTitle } from "../services/movieApi.js";
-import { getState, setState } from "../state/appState.js";
+import { setState } from "../state/appState.js";
 import { debounce } from "../utils/debounce.js";
-// let searchTimer;
+
 let searchController = null;
 
 let currentQuery = "";
 let currentPage = 1;
 let totalPages = 1;
-let apiMovies = [];
 
+let apiMovies = [];
 let localMovies = [];
 
-// const DEBOUNCE_DELAY = 500;
 
-// Get the selected filters
+// Get selected filters
 function getSelectedFilters() {
     return {
         genre: document.getElementById("genreFilter")?.value || "",
@@ -25,75 +23,64 @@ function getSelectedFilters() {
     };
 }
 
-// Apply genre, year, rating and sorting
+
+// Filter and sort movies
 function filterMovies(movies) {
     const filters = getSelectedFilters();
 
-    let filteredMovies = movies.filter(movie => {
-
+    let results = movies.filter(movie => {
         if (
             filters.genre &&
             !movie.genre_ids?.includes(Number(filters.genre))
         ) return false;
 
-        const movieYear = movie.release_date?.split("-")[0] || "";
+        const year = movie.release_date?.split("-")[0] || "";
 
-        if (filters.year && movieYear !== filters.year) {
-            return false;
-        }
+        if (filters.year && year !== filters.year) return false;
 
         if (
             filters.rating &&
-            (movie.vote_average || 0) < Number(filters.rating)
+            movie.vote_average < Number(filters.rating)
         ) return false;
 
         return true;
     });
 
     if (filters.sort === "rating") {
-        filteredMovies.sort(
-            (a, b) => b.vote_average - a.vote_average
-        );
+        results.sort((a, b) => b.vote_average - a.vote_average);
     }
 
     if (filters.sort === "popularity") {
-        filteredMovies.sort(
-            (a, b) => b.popularity - a.popularity
-        );
+        results.sort((a, b) => b.popularity - a.popularity);
     }
 
     if (filters.sort === "year") {
-        filteredMovies.sort(
-            (a, b) =>
-                new Date(b.release_date || 0) -
-                new Date(a.release_date || 0)
+        results.sort(
+            (a, b) => new Date(b.release_date || 0) - new Date(a.release_date || 0)
         );
     }
 
-    return filteredMovies;
+    return results;
 }
 
-// Render movie results using the reusable grid
+
+// Display movie results
 function renderResults(movies, showLoadMore = false) {
-    const resultsContainer = document.getElementById("searchResults");
+    const container = document.getElementById("searchResults");
 
-    if (!resultsContainer) return;
+    if (!container) return;
 
-    const movieResults = movies.length === 0
-        ? `
-            <p class="text-gray-400 text-center py-10">
-                No movies found. Try another search.
-            </p>
-        `
-        : renderMovieGrid(movies);
-
-    resultsContainer.innerHTML = `
-        ${movieResults}
+    container.innerHTML = `
+        ${movies.length
+            ? renderMovieGrid(movies)
+            : `<p class="text-gray-400 text-center py-10">
+                    No movies found. Try another search.
+               </p>`
+        }
 
         ${showLoadMore ? `
             <div class="text-center py-6">
-                <button
-                    id="loadMoreMovies"
+                <button id="loadMoreMovies"
                     class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg">
                     Load More
                 </button>
@@ -102,71 +89,51 @@ function renderResults(movies, showLoadMore = false) {
     `;
 }
 
+
 // Show or hide homepage sections
 function toggleHomeSections(isSearching) {
-    const homeContent = document.getElementById("homeContent");
-    const homeSections = document.getElementById("homeSections");
+    ["homeContent", "homeSections"].forEach(id => {
+        const element = document.getElementById(id);
 
-    if (homeContent) {
-        homeContent.style.display = isSearching ? "none" : "block";
-    }
-
-    if (homeSections) {
-        homeSections.style.display = isSearching ? "none" : "block";
-    }
+        if (element) {
+            element.style.display = isSearching ? "none" : "block";
+        }
+    });
 }
 
-// Search movies using TMDB
-async function fetchSearchResults(query, page = 1) {
 
-    if (searchController) {
-        searchController.abort();
-    }
+// Fetch movies from TMDB
+async function fetchSearchResults(query, page = 1) {
+    searchController?.abort();
 
     const controller = new AbortController();
     searchController = controller;
 
-    const resultsContainer = document.getElementById("searchResults");
+    const container = document.getElementById("searchResults");
 
-    if (!resultsContainer) return;
+    if (!container) return;
 
     if (page === 1) {
         apiMovies = [];
-        currentPage = 1;
 
-        resultsContainer.innerHTML = `
+        container.innerHTML = `
             <p class="text-gray-400 text-center py-10">
                 Searching movies...
             </p>
         `;
     } else {
-        const loadMoreButton = document.getElementById("loadMoreMovies");
+        const button = document.getElementById("loadMoreMovies");
 
-        if (loadMoreButton) {
-            loadMoreButton.disabled = true;
-            loadMoreButton.textContent = "Loading...";
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Loading...";
         }
     }
 
     try {
-        const data = await getMoviesByTitle(
-            query,
-            page,
-            controller.signal
-        );
+        const data = await getMoviesByTitle(query, page, controller.signal);
 
-        // Ignore outdated requests
         if (searchController !== controller) return;
-
-        // Validate basic API response structure
-        if (
-            !data ||
-            !Array.isArray(data.results) ||
-            typeof data.page !== "number" ||
-            typeof data.total_pages !== "number"
-        ) {
-            throw new Error("Invalid movie search response");
-        }
 
         currentPage = data.page;
         totalPages = Math.min(data.total_pages, 500);
@@ -175,7 +142,6 @@ async function fetchSearchResults(query, page = 1) {
             ? data.results
             : [...apiMovies, ...data.results];
 
-        // Update shared state
         setState({
             searchQuery: query,
             searchMovies: apiMovies,
@@ -183,22 +149,19 @@ async function fetchSearchResults(query, page = 1) {
             searchTotalPages: totalPages
         });
 
-        const filteredMovies = filterMovies(apiMovies);
-
         renderResults(
-            filteredMovies,
+            filterMovies(apiMovies),
             currentPage < totalPages
         );
 
     } catch (error) {
-
         if (error.name === "AbortError") return;
-
-        console.error("Movie Search Error:", error);
 
         if (searchController !== controller) return;
 
-        resultsContainer.innerHTML = `
+        console.error("Movie Search Error:", error);
+
+        container.innerHTML = `
             <p class="text-red-400 text-center py-10">
                 Something went wrong. Please try again.
             </p>
@@ -206,15 +169,23 @@ async function fetchSearchResults(query, page = 1) {
     }
 }
 
-// Start a debounced search
+
+// Debounce API search
+const fetchSearchResultsDebounced = debounce(query => {
+    fetchSearchResults(query, 1);
+}, 500);
+
+
+// Handle search input
 function handleTitleSearch(query) {
+    fetchSearchResultsDebounced.cancel();
 
-    if (searchController) {
-        searchController.abort();
-        searchController = null;
-    }
+    searchController?.abort();
+    searchController = null;
 
-    const currentQuery = query.trim();
+    currentQuery = query.trim();
+    currentPage = 1;
+    apiMovies = [];
 
     setState({
         searchQuery: currentQuery,
@@ -230,30 +201,25 @@ function handleTitleSearch(query) {
         return;
     }
 
-    document.getElementById("searchResults").innerHTML = `
-        <p class="text-gray-400 text-center py-10">
-            Searching movies...
-        </p>
-    `;
+    const container = document.getElementById("searchResults");
+
+    if (container) {
+        container.innerHTML = `
+            <p class="text-gray-400 text-center py-10">
+                Searching movies...
+            </p>
+        `;
+    }
 
     fetchSearchResultsDebounced(currentQuery);
 }
 
-const fetchSearchResultsDebounced = debounce(query => {
-    fetchSearchResults(query, 1);
-}, 500);
 
-// Local filtering function
+// Apply local filters or search filters
 export function searchMovies(movies) {
+    const results = document.getElementById("searchResults");
 
-    const desktopSearch = document.getElementById("movieSearch");
-    const mobileSearch = document.getElementById("mobileMovieSearch");
-
-    const searchText = (
-        desktopSearch?.value || mobileSearch?.value || ""
-    ).trim();
-
-    if (searchText) {
+    if (currentQuery) {
         renderResults(
             filterMovies(apiMovies),
             currentPage < totalPages
@@ -263,29 +229,21 @@ export function searchMovies(movies) {
 
     const filters = getSelectedFilters();
 
-    const isFiltering =
-        filters.genre ||
-        filters.year ||
-        filters.rating ||
-        filters.sort;
+    const isFiltering = Object.values(filters).some(Boolean);
 
-    toggleHomeSections(Boolean(isFiltering));
-
-    const resultsContainer = document.getElementById("searchResults");
+    toggleHomeSections(isFiltering);
 
     if (!isFiltering) {
-        if (resultsContainer) {
-            resultsContainer.innerHTML = "";
-        }
+        if (results) results.innerHTML = "";
         return;
     }
 
     renderResults(filterMovies(movies));
 }
 
+
 // Initialize search and filters
 export function initializeSearchFilters(movies) {
-
     localMovies = movies;
 
     const desktopSearch = document.getElementById("movieSearch");
@@ -297,23 +255,13 @@ export function initializeSearchFilters(movies) {
 
     filters.forEach(filter => {
         filter.addEventListener("change", () => {
-            if (currentQuery) {
-                searchMovies(apiMovies);
-            } else {
-                searchMovies(localMovies);
-            }
+            searchMovies(currentQuery ? apiMovies : localMovies);
         });
     });
 
     function handleSearchInput(event) {
-
-        if (event.target === desktopSearch && mobileSearch) {
-            mobileSearch.value = desktopSearch.value;
-        }
-
-        if (event.target === mobileSearch && desktopSearch) {
-            desktopSearch.value = mobileSearch.value;
-        }
+        if (desktopSearch) desktopSearch.value = event.target.value;
+        if (mobileSearch) mobileSearch.value = event.target.value;
 
         handleTitleSearch(event.target.value);
     }
@@ -321,17 +269,11 @@ export function initializeSearchFilters(movies) {
     desktopSearch?.addEventListener("input", handleSearchInput);
     mobileSearch?.addEventListener("input", handleSearchInput);
 
-    // Load the next page
-    document.getElementById("searchResults")?.addEventListener(
-        "click",
-        event => {
-            const button = event.target.closest("#loadMoreMovies");
-
-            if (!button) return;
-
-            if (currentPage < totalPages && currentQuery) {
+    document.getElementById("searchResults")?.addEventListener("click", event => {
+        if (event.target.closest("#loadMoreMovies")) {
+            if (currentQuery && currentPage < totalPages) {
                 fetchSearchResults(currentQuery, currentPage + 1);
             }
         }
-    );
+    });
 }

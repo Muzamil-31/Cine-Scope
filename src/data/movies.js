@@ -1,4 +1,3 @@
-
 const movies = [
     {
         id: 1,

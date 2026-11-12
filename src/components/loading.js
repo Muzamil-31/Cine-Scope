@@ -1,4 +1,3 @@
-
 import { renderMovieGrid } from "./movieGrid.js";
 import { getMoviesByTitle } from "../services/movieApi.js";
 import { setState } from "../state/appState.js";

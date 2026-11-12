@@ -1,4 +1,3 @@
-
 const BASE_URL = "https://api.themoviedb.org/3";
 
 // Use a newly generated token.

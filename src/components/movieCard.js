@@ -8,16 +8,18 @@ export function renderMovieCard(movie, isCarousel = false) {
     const year = movie.release_date
         ? movie.release_date.split("-")[0]
         : "N/A";
+
     const posterUrl = movie.poster_path
         ? IMAGE_URL + movie.poster_path
         : "https://placehold.co/500x750?text=No+Poster";
+
     const layoutClass = isCarousel
         ? "min-w-[160px] md:min-w-[200px] shrink-0"
         : "w-full min-w-0";
 
     return `
         <article
-            class="relative ${layoutClass} bg-gray-900 rounded-lg overflow-hidden group"
+            class="relative ${layoutClass} bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden group shadow-sm dark:shadow-none"
         >
 
             <a
@@ -39,11 +41,11 @@ export function renderMovieCard(movie, isCarousel = false) {
                         ${movie.title}
                     </h3>
 
-                    <p class="text-sm text-gray-400 mt-1">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         Movie
                     </p>
 
-                    <div class="flex justify-between items-center mt-2 text-sm text-gray-400">
+                    <div class="flex justify-between items-center mt-2 text-sm text-gray-600 dark:text-gray-400">
                         <span>${year}</span>
                         <span>⭐ ${movie.vote_average?.toFixed(1) || "N/A"}</span>
                     </div>

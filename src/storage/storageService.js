@@ -1,4 +1,3 @@
-
 const STORAGE_KEY = "cinescope_watchlist";
 
 // Get watchlist safely

@@ -1,4 +1,3 @@
-
 import { fetchMovies } from "./movieApi.js";
 
 export async function getMovieDetails(movieId) {
