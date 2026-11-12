@@ -1,15 +1,61 @@
 
- // Get watchlist
+const STORAGE_KEY = "cinescope_watchlist";
+
+// Get watchlist safely
 export function getWatchlist() {
-    return JSON.parse(localStorage.getItem("cinescope_watchlist")) || [];
+    try {
+        const storedData = localStorage.getItem(STORAGE_KEY);
+
+        if (!storedData) return [];
+
+        const watchlist = JSON.parse(storedData);
+
+        // Validate stored data
+        if (!Array.isArray(watchlist)) {
+            return [];
+        }
+
+        return watchlist.filter(
+            movie => movie &&
+            typeof movie === "object" &&
+            movie.id !== undefined
+        );
+
+    } catch (error) {
+        console.error("Failed to read watchlist:", error);
+        return [];
+    }
+}
+
+// Save watchlist safely
+function saveWatchlist(watchlist) {
+    try {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(watchlist)
+        );
+
+        return true;
+
+    } catch (error) {
+        console.error("Failed to save watchlist:", error);
+        return false;
+    }
 }
 
 // Add movie to watchlist
 export function addToWatchlist(movie) {
-    let watchlist = getWatchlist();
+
+    if (!movie || movie.id === undefined) {
+        return false;
+    }
+
+    const watchlist = getWatchlist();
 
     // Prevent duplicates
-    const exists = watchlist.some(item => item.id === movie.id);
+    const exists = watchlist.some(
+        item => String(item.id) === String(movie.id)
+    );
 
     if (exists) {
         return false;
@@ -20,29 +66,33 @@ export function addToWatchlist(movie) {
         watched: false
     });
 
-    localStorage.setItem("cinescope_watchlist", JSON.stringify(watchlist));
-
-    return true;
+    return saveWatchlist(watchlist);
 }
 
 // Remove movie from watchlist
 export function removeFromWatchlist(movieId) {
-    let watchlist = getWatchlist();
 
-    watchlist = watchlist.filter(movie => movie.id !== movieId);
+    const watchlist = getWatchlist();
 
-    localStorage.setItem("cinescope_watchlist", JSON.stringify(watchlist));
+    const updatedWatchlist = watchlist.filter(
+        movie => String(movie.id) !== String(movieId)
+    );
+
+    return saveWatchlist(updatedWatchlist);
 }
 
 // Mark movie as watched or unwatched
 export function toggleWatched(movieId) {
-    let watchlist = getWatchlist();
 
-    for (let i = 0; i < watchlist.length; i++) {
-        if (watchlist[i].id === movieId) {
-            watchlist[i].watched = !watchlist[i].watched;
-        }
-    }
+    const watchlist = getWatchlist();
 
-    localStorage.setItem("cinescope_watchlist", JSON.stringify(watchlist));
+    const movie = watchlist.find(
+        item => String(item.id) === String(movieId)
+    );
+
+    if (!movie) return false;
+
+    movie.watched = !movie.watched;
+
+    return saveWatchlist(watchlist);
 }

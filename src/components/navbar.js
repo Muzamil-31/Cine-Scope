@@ -14,7 +14,7 @@ export function renderNavbar() {
                 <div class="hidden md:flex items-center gap-8 text-gray-300">
                     <a href="index.html" class="hover:text-red-500 transition">Home</a>
                     <a href="watchlist.html" class="hover:text-red-500 transition">Watchlist</a>
-                    <a href="#" class="hover:text-red-500 transition">Compare</a>
+                    <a href="compare.html" class="hover:text-red-500 transition">Compare</a>
                 </div>
 
                 <!-- Desktop Search -->
@@ -36,7 +36,6 @@ export function renderNavbar() {
                 <!-- Mobile Actions -->
                 <div class="flex md:hidden items-center gap-2">
 
-                    <!-- Search Button -->
                     <button
                         id="mobileSearchBtn"
                         class="text-white p-2"
@@ -54,7 +53,6 @@ export function renderNavbar() {
                         </svg>
                     </button>
 
-                    <!-- Hamburger -->
                     <button
                         id="menuBtn"
                         class="text-white p-2"
@@ -78,8 +76,7 @@ export function renderNavbar() {
             <!-- Mobile Search Overlay -->
             <div
                 id="mobileSearchContainer"
-                class="absolute top-full right-4 z-50 w-56 overflow-hidden bg-gray-900 rounded-lg shadow-xl transition-all duration-300 ease-in-out"
-                style="max-height: 0; opacity: 0; visibility: hidden;"
+                class="absolute top-full right-4 z-50 w-56 max-h-0 invisible opacity-0 overflow-hidden bg-gray-900 rounded-lg shadow-xl transition-all duration-300 ease-in-out"
             >
                 <div class="p-3">
                     <input
@@ -94,8 +91,7 @@ export function renderNavbar() {
             <!-- Mobile Menu Overlay -->
             <div
                 id="mobileMenu"
-                class="absolute top-full left-0 z-40 w-full overflow-hidden bg-gray-900 shadow-xl transition-all duration-300 ease-in-out"
-                style="max-height: 0; opacity: 0; visibility: hidden;"
+                class="absolute top-full left-0 z-40 w-full max-h-0 invisible opacity-0 overflow-hidden bg-gray-900 shadow-xl transition-all duration-300 ease-in-out"
             >
                 <div class="flex flex-col gap-5 px-6 py-5 text-gray-300">
 
@@ -107,7 +103,7 @@ export function renderNavbar() {
                         Watchlist
                     </a>
 
-                    <a href="#" class="hover:text-red-500 transition">
+                    <a href="compare.html" class="hover:text-red-500 transition">
                         Compare
                     </a>
 
@@ -135,56 +131,72 @@ export function initializeNavbar() {
 
     const searchBtn = document.getElementById("mobileSearchBtn");
     const searchContainer = document.getElementById("mobileSearchContainer");
+
     const mobileSearch = document.getElementById("mobileMovieSearch");
     const desktopSearch = document.getElementById("movieSearch");
 
     // Hamburger Menu
     menuBtn?.addEventListener("click", () => {
 
+        if (!mobileMenu || !searchContainer || !searchBtn) return;
+
         const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
 
-        // Close search when menu opens
+        // Close search
         searchContainer.style.maxHeight = "0px";
         searchContainer.style.opacity = "0";
         searchContainer.style.visibility = "hidden";
+
         searchBtn.setAttribute("aria-expanded", "false");
 
         if (isOpen) {
+
             mobileMenu.style.maxHeight = "0px";
             mobileMenu.style.opacity = "0";
             mobileMenu.style.visibility = "hidden";
 
             menuBtn.setAttribute("aria-expanded", "false");
 
-            menuIcon.innerHTML =
-                '<path d="M4 6h16M4 12h16M4 18h16"></path>';
+            if (menuIcon) {
+                menuIcon.innerHTML =
+                    '<path d="M4 6h16M4 12h16M4 18h16"></path>';
+            }
 
         } else {
+
             mobileMenu.style.visibility = "visible";
             mobileMenu.style.maxHeight = mobileMenu.scrollHeight + "px";
             mobileMenu.style.opacity = "1";
 
             menuBtn.setAttribute("aria-expanded", "true");
 
-            menuIcon.innerHTML =
-                '<path d="m18 6-12 12M6 6l12 12"></path>';
+            if (menuIcon) {
+                menuIcon.innerHTML =
+                    '<path d="m18 6-12 12M6 6l12 12"></path>';
+            }
         }
 
     });
 
+
     // Mobile Search
     searchBtn?.addEventListener("click", () => {
 
+        if (!searchContainer || !mobileMenu || !menuBtn) return;
+
         const isOpen = searchBtn.getAttribute("aria-expanded") === "true";
 
-        // Close menu when search opens
+        // Close menu
         mobileMenu.style.maxHeight = "0px";
         mobileMenu.style.opacity = "0";
         mobileMenu.style.visibility = "hidden";
+
         menuBtn.setAttribute("aria-expanded", "false");
 
-        menuIcon.innerHTML =
-            '<path d="M4 6h16M4 12h16M4 18h16"></path>';
+        if (menuIcon) {
+            menuIcon.innerHTML =
+                '<path d="M4 6h16M4 12h16M4 18h16"></path>';
+        }
 
         if (isOpen) {
 
@@ -202,10 +214,11 @@ export function initializeNavbar() {
 
             searchBtn.setAttribute("aria-expanded", "true");
 
-            mobileSearch.focus();
+            mobileSearch?.focus();
         }
 
     });
+
 
     // Synchronize Search Inputs
     if (desktopSearch && mobileSearch) {
@@ -219,4 +232,5 @@ export function initializeNavbar() {
         });
 
     }
+
 }

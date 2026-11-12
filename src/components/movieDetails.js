@@ -167,7 +167,7 @@ export function renderMovieDetails(movieData) {
 
                     ${
                         similar.length > 0
-                            ? similar.map(movie => renderMovieCard(movie)).join("")
+                            ? similar.map(movie => renderMovieCard(movie, true)).join("")
                             : `<p class="text-gray-400">No similar movies found.</p>`
                     }
 
@@ -186,7 +186,7 @@ export function renderMovieDetails(movieData) {
 
                     ${
                         recommended.length > 0
-                            ? recommended.map(movie => renderMovieCard(movie)).join("")
+                            ? recommended.map(movie => renderMovieCard(movie, true)).join("")
                             : `<p class="text-gray-400">No recommendations found.</p>`
                     }
 

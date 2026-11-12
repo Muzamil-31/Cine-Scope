@@ -1,11 +1,12 @@
 
 import { renderMovieCard } from "./movieCard.js";
 
-export function renderMovieSection(title, movies) {
+export function renderMovieSection(title, movies = []) {
+
     let movieHTML = "";
 
     for (let i = 0; i < movies.length; i++) {
-        movieHTML += renderMovieCard(movies[i]);
+        movieHTML += renderMovieCard(movies[i], true);
     }
 
     return `
@@ -18,6 +19,7 @@ export function renderMovieSection(title, movies) {
                     <button
                         class="scrollLeft bg-gray-800 hover:bg-red-600 p-2 rounded-full"
                         aria-label="Scroll left"
+                        type="button"
                     >
                         &#10094;
                     </button>
@@ -25,41 +27,53 @@ export function renderMovieSection(title, movies) {
                     <button
                         class="scrollRight bg-gray-800 hover:bg-red-600 p-2 rounded-full"
                         aria-label="Scroll right"
+                        type="button"
                     >
                         &#10095;
                     </button>
                 </div>
             </div>
 
-            <div class="movieContainer flex gap-5 overflow-x-auto scroll-smooth pb-3"
-                 style="scrollbar-width: none;">
-
+            <div
+                class="movieContainer flex gap-5 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:none]"
+            >
                 ${movieHTML}
-
             </div>
 
         </section>
     `;
 }
+
+
 export function initializeMovieSections() {
+
     document.querySelectorAll(".movieContainer").forEach(container => {
+
         const section = container.closest("section");
+
+        if (!section) return;
 
         const leftBtn = section.querySelector(".scrollLeft");
         const rightBtn = section.querySelector(".scrollRight");
 
-        leftBtn.addEventListener("click", function () {
+        leftBtn?.addEventListener("click", () => {
+
             container.scrollBy({
                 left: -400,
                 behavior: "smooth"
             });
+
         });
 
-        rightBtn.addEventListener("click", function () {
+        rightBtn?.addEventListener("click", () => {
+
             container.scrollBy({
                 left: 400,
                 behavior: "smooth"
             });
+
         });
+
     });
+
 }

@@ -1,5 +1,15 @@
 
-export function renderSearchBar() {
+export function renderSearchBar(genres = [], movies = []) {
+
+    // Get all available release years and sort newest first
+    const years = [
+        ...new Set(
+            movies
+                .map(movie => movie.release_date?.split("-")[0])
+                .filter(Boolean)
+        )
+    ].sort((a, b) => Number(b) - Number(a));
+
     return `
         <section class="p-5">
 
@@ -7,17 +17,22 @@ export function renderSearchBar() {
 
                 <select id="genreFilter" class="bg-gray-900 p-3 rounded-lg">
                     <option value="">All Genres</option>
-                    <option value="Action">Action</option>
-                    <option value="Comedy">Comedy</option>
-                    <option value="Drama">Drama</option>
-                    <option value="Horror">Horror</option>
+
+                    ${genres.map(genre => `
+                        <option value="${genre.id}">
+                            ${genre.name}
+                        </option>
+                    `).join("")}
+
                 </select>
 
                 <select id="yearFilter" class="bg-gray-900 p-3 rounded-lg">
                     <option value="">All Years</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
+
+                    ${years.map(year => `
+                        <option value="${year}">${year}</option>
+                    `).join("")}
+
                 </select>
 
                 <select id="ratingFilter" class="bg-gray-900 p-3 rounded-lg">
@@ -31,6 +46,7 @@ export function renderSearchBar() {
                     <option value="">Default</option>
                     <option value="rating">Highest Rating</option>
                     <option value="popularity">Most Popular</option>
+                    <option value="year">Newest First</option>
                 </select>
 
             </div>

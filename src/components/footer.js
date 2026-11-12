@@ -81,17 +81,49 @@ export function renderFooter() {
 
                 </div>
 
-                <!-- Bottom Section -->
-                <div class="border-t border-gray-800 mt-12 pt-6">
+                <!-- TMDB Attribution -->
+                <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+
+                    <a
+                        href="https://www.themoviedb.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block mb-4"
+                    >
+                        <img
+                            src="https://www.themoviedb.org/assets/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg"
+                            alt="The Movie Database (TMDB)"
+                            class="w-28 mx-auto"
+                        >
+                    </a>
+
+                    <p class="text-sm text-gray-300 mb-2">
+                        Movie information and images provided by TMDB.
+                    </p>
+
+                    <p class="text-xs leading-6 max-w-2xl mx-auto">
+                        This product uses the TMDB API but is not endorsed
+                        or certified by TMDB.
+                    </p>
+
+                    <a
+                        href="https://www.themoviedb.org/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block text-sm mt-3 hover:text-red-500"
+                    >
+                        Visit The Movie Database
+                    </a>
+
+                </div>
+
+                <!-- Copyright and Social Links -->
+                <div class="border-t border-gray-800 mt-8 pt-6">
 
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
 
                         <p class="text-sm text-center">
                             © 2026 CineScope. All rights reserved.
-                        </p>
-
-                        <p class="text-sm text-center">
-                            Movie information and images provided by TMDB.
                         </p>
 
                         <div class="flex gap-5 text-sm">

@@ -1,25 +1,76 @@
 
 const STORAGE_KEY = "cinescope_preferences";
 
+const DEFAULT_PREFERENCES = {
+    preferredGenres: [],
+    recentlyViewed: [],
+    theme: "dark"
+};
+
+// Get preferences safely
 function getPreferences() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-        preferredGenres: [],
-        recentlyViewed: [],
-        theme: "dark"
-    };
+    try {
+        const storedData = localStorage.getItem(STORAGE_KEY);
+
+        if (!storedData) {
+            return { ...DEFAULT_PREFERENCES };
+        }
+
+        const preferences = JSON.parse(storedData);
+
+        if (
+            !preferences ||
+            typeof preferences !== "object" ||
+            Array.isArray(preferences)
+        ) {
+            return { ...DEFAULT_PREFERENCES };
+        }
+
+        return {
+            preferredGenres: Array.isArray(preferences.preferredGenres)
+                ? preferences.preferredGenres
+                : [],
+
+            recentlyViewed: Array.isArray(preferences.recentlyViewed)
+                ? preferences.recentlyViewed
+                : [],
+
+            theme: ["dark", "light"].includes(preferences.theme)
+                ? preferences.theme
+                : "dark"
+        };
+
+    } catch (error) {
+        console.error("Failed to read preferences:", error);
+        return { ...DEFAULT_PREFERENCES };
+    }
 }
 
+// Save preferences safely
 function savePreferences(preferences) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+    try {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(preferences)
+        );
+
+        return true;
+
+    } catch (error) {
+        console.error("Failed to save preferences:", error);
+        return false;
+    }
 }
 
 // Save preferred genres
 export function savePreferredGenres(genres) {
+    if (!Array.isArray(genres)) return false;
+
     const preferences = getPreferences();
 
     preferences.preferredGenres = genres;
 
-    savePreferences(preferences);
+    return savePreferences(preferences);
 }
 
 // Get preferred genres
@@ -29,17 +80,19 @@ export function getPreferredGenres() {
 
 // Save recently viewed movies
 export function addRecentlyViewed(movie) {
+    if (!movie || movie.id === undefined) return false;
+
     const preferences = getPreferences();
 
     preferences.recentlyViewed = preferences.recentlyViewed.filter(
-        item => item.id !== movie.id
+        item => String(item.id) !== String(movie.id)
     );
 
     preferences.recentlyViewed.unshift(movie);
 
     preferences.recentlyViewed = preferences.recentlyViewed.slice(0, 5);
 
-    savePreferences(preferences);
+    return savePreferences(preferences);
 }
 
 // Get recently viewed movies
@@ -49,11 +102,13 @@ export function getRecentlyViewed() {
 
 // Save theme preference
 export function saveTheme(theme) {
+    if (!["dark", "light"].includes(theme)) return false;
+
     const preferences = getPreferences();
 
     preferences.theme = theme;
 
-    savePreferences(preferences);
+    return savePreferences(preferences);
 }
 
 // Get saved theme

@@ -21,19 +21,3 @@ export function renderError() {
         </div>
     `;
 }
-let movieCache = {};
-
-export async function getMovies(url) {
-
-    if (movieCache[url]) {
-        return movieCache[url];
-    }
-
-    const response = await fetch(url);
-
-    const data = await response.json();
-
-    movieCache[url] = data;
-
-    return data;
-}

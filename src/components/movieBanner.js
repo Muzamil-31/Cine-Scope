@@ -1,72 +1,95 @@
-import { trendingMovies } from "../data/movies.js";
 
-export function renderMovieBanner() {
-    const movies = trendingMovies.slice(0, 5);
+const IMAGE_URL = "https://image.tmdb.org/t/p/original";
+
+export function renderMovieBanner(movies, genres = []) {
+
+    const bannerMovies = movies.slice(0, 5);
 
     return `
-        <section class="relative w-full h-[520px] sm:h-[600px] md:h-[800px] overflow-hidden">
+       <section class="relative w-full h-[450px] sm:h-[520px] md:h-[750px] overflow-hidden">
 
             <div
                 id="bannerTrack"
                 class="flex h-full transition-transform duration-700 ease-in-out"
             >
 
-                ${movies.map(movie => `
-                    <div
-                        class="relative min-w-full h-full bg-cover bg-center flex items-end"
-                        style="
-                            background-image:
-                            linear-gradient(to top, #030712 5%, rgba(3,7,18,0.65) 45%, rgba(3,7,18,0.1) 100%),
-                            url('${movie.backdrop}');
-                        "
-                    >
+                ${bannerMovies.map(movie => {
 
-                        <div class="w-full px-4 pb-16 sm:px-8 sm:pb-20 md:px-12 md:pb-24">
+                    const year = movie.release_date
+                        ? movie.release_date.split("-")[0]
+                        : "N/A";
+                    const runtime = Number.isFinite(movie.runtime) && movie.runtime > 0
+                        ? `${movie.runtime} min`
+                        : "N/A";
 
-                            <div class="max-w-2xl">
+                    const movieGenres = movie.genre_ids
+                        ?.map(id => genres.find(genre => genre.id === id)?.name)
+                        .filter(Boolean)
+                        .join(", ");
 
-                                <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
-                                    ${movie.title}
-                                </h2>
+                    return `
+                        <div
+                            class="relative min-w-full h-full bg-cover bg-top flex items-end"
+                            style="
+                               background-image:
+    linear-gradient(
+        to top,
+        rgba(3, 7, 18, 0.85) 0%,
+        rgba(3, 7, 18, 0.35) 25%,
+        rgba(3, 7, 18, 0.10) 55%,
+        transparent 100%
+    ),
+    url('${movie.backdrop_path ? IMAGE_URL + movie.backdrop_path : ""}');
+                            "
+                        >
 
-                                <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-300 mb-3">
-                                    <span>${movie.year}</span>
-                                    <span>•</span>
-                                    <span>${movie.runtime} min</span>
-                                    <span>•</span>
-                                    <span>⭐ ${movie.rating}</span>
+                            <div class="w-full px-4 pb-16 sm:px-8 sm:pb-20 md:px-12 md:pb-24">
+
+                                <div class="max-w-2xl">
+
+                                    <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+                                        ${movie.title}
+                                    </h2>
+
+                                    <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-300 mb-3">
+                                        <span>${year}</span>
+                                        <span>•</span>
+                                        <span>${runtime}</span>
+                                        <span>•</span>
+                                        <span>Ratings ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+                                    </div>
+
+                                    <p class="text-red-400 text-sm font-semibold mb-3">
+                                        ${movieGenres || "Movie"}
+                                    </p>
+
+                                    <p class="text-sm sm:text-base text-gray-300 mb-5 sm:mb-6 leading-relaxed line-clamp-3">
+                                        ${movie.overview}
+                                    </p>
+
+                                    <div class="flex flex-wrap gap-3">
+
+                                        <button class="bg-red-600 hover:bg-red-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg">
+                                            Watch Now
+                                        </button>
+
+                                        <button class="bg-gray-700 hover:bg-gray-600 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg">
+                                            More Info
+                                        </button>
+
+                                    </div>
+
                                 </div>
-
-                                <p class="text-red-400 text-sm font-semibold mb-3">
-                                    ${movie.genre}
-                                </p>
-
-                                <p class="text-sm sm:text-base text-gray-300 mb-5 sm:mb-6 leading-relaxed line-clamp-3">
-                                    ${movie.overview}
-                                </p>
-
-                                <div class="flex flex-wrap gap-3">
-
-                                    <button class="bg-red-600 hover:bg-red-700 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg">
-                                        Watch Now
-                                    </button>
-
-                                    <button class="bg-gray-700 hover:bg-gray-600 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg">
-                                        More Info
-                                    </button>
-
-                                </div>
-
                             </div>
                         </div>
-                    </div>
-                `).join("")}
+                    `;
+                }).join("")}
 
             </div>
 
             <div class="absolute bottom-5 right-4 sm:right-8 flex items-center gap-2 z-20">
 
-                ${movies.map((movie, index) => `
+                ${bannerMovies.map((movie, index) => `
                     <div
                         class="banner-indicator h-2 rounded-full transition-all duration-500
                         ${index === 0 ? "w-8 bg-red-600" : "w-2 bg-white/60"}"
