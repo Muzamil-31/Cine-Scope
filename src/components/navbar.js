@@ -40,6 +40,7 @@ export function renderNavbar() {
                         id="mobileSearchBtn"
                         class="text-white p-2"
                         type="button"
+                        aria-controls="mobileSearchContainer"
                         aria-expanded="false"
                         aria-label="Search"
                     >
@@ -57,6 +58,7 @@ export function renderNavbar() {
                         id="menuBtn"
                         class="text-white p-2"
                         type="button"
+                        aria-controls="mobileMenu"
                         aria-expanded="false"
                         aria-label="Menu"
                     >
@@ -76,7 +78,7 @@ export function renderNavbar() {
             <!-- Mobile Search Overlay -->
             <div
                 id="mobileSearchContainer"
-                class="absolute top-full right-4 z-50 w-56 max-h-0 invisible opacity-0 overflow-hidden bg-gray-900 rounded-lg shadow-xl transition-all duration-300 ease-in-out"
+                class="absolute top-full right-4 z-50 hidden w-56 overflow-hidden bg-gray-900 rounded-lg shadow-xl"
             >
                 <div class="p-3">
                     <input
@@ -91,7 +93,7 @@ export function renderNavbar() {
             <!-- Mobile Menu Overlay -->
             <div
                 id="mobileMenu"
-                class="absolute top-full left-0 z-40 w-full max-h-0 invisible opacity-0 overflow-hidden bg-gray-900 shadow-xl transition-all duration-300 ease-in-out"
+                class="absolute top-full left-0 z-40 hidden w-full bg-gray-900 shadow-xl"
             >
                 <div class="flex flex-col gap-5 px-6 py-5 text-gray-300">
 
@@ -143,17 +145,13 @@ export function initializeNavbar() {
         const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
 
         // Close search
-        searchContainer.style.maxHeight = "0px";
-        searchContainer.style.opacity = "0";
-        searchContainer.style.visibility = "hidden";
+        searchContainer.classList.add("hidden");
 
         searchBtn.setAttribute("aria-expanded", "false");
 
         if (isOpen) {
 
-            mobileMenu.style.maxHeight = "0px";
-            mobileMenu.style.opacity = "0";
-            mobileMenu.style.visibility = "hidden";
+            mobileMenu.classList.add("hidden");
 
             menuBtn.setAttribute("aria-expanded", "false");
 
@@ -164,9 +162,7 @@ export function initializeNavbar() {
 
         } else {
 
-            mobileMenu.style.visibility = "visible";
-            mobileMenu.style.maxHeight = mobileMenu.scrollHeight + "px";
-            mobileMenu.style.opacity = "1";
+            mobileMenu.classList.remove("hidden");
 
             menuBtn.setAttribute("aria-expanded", "true");
 
@@ -187,9 +183,7 @@ export function initializeNavbar() {
         const isOpen = searchBtn.getAttribute("aria-expanded") === "true";
 
         // Close menu
-        mobileMenu.style.maxHeight = "0px";
-        mobileMenu.style.opacity = "0";
-        mobileMenu.style.visibility = "hidden";
+        mobileMenu.classList.add("hidden");
 
         menuBtn.setAttribute("aria-expanded", "false");
 
@@ -200,17 +194,13 @@ export function initializeNavbar() {
 
         if (isOpen) {
 
-            searchContainer.style.maxHeight = "0px";
-            searchContainer.style.opacity = "0";
-            searchContainer.style.visibility = "hidden";
+            searchContainer.classList.add("hidden");
 
             searchBtn.setAttribute("aria-expanded", "false");
 
         } else {
 
-            searchContainer.style.visibility = "visible";
-            searchContainer.style.maxHeight = "70px";
-            searchContainer.style.opacity = "1";
+            searchContainer.classList.remove("hidden");
 
             searchBtn.setAttribute("aria-expanded", "true");
 

@@ -47,7 +47,7 @@ function saveWatchlist(watchlist) {
 export function addToWatchlist(movie) {
 
     if (!movie || movie.id === undefined) {
-        return false;
+        return "error";
     }
 
     const watchlist = getWatchlist();
@@ -58,7 +58,7 @@ export function addToWatchlist(movie) {
     );
 
     if (exists) {
-        return false;
+        return "duplicate";
     }
 
     watchlist.push({
@@ -66,7 +66,7 @@ export function addToWatchlist(movie) {
         watched: false
     });
 
-    return saveWatchlist(watchlist);
+    return saveWatchlist(watchlist) ? "added" : "error";
 }
 
 // Remove movie from watchlist

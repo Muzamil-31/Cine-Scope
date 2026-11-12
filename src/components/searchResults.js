@@ -79,17 +79,16 @@ function renderResults(movies, showLoadMore = false) {
 
     if (!resultsContainer) return;
 
-    if (movies.length === 0) {
-        resultsContainer.innerHTML = `
+    const movieResults = movies.length === 0
+        ? `
             <p class="text-gray-400 text-center py-10">
                 No movies found. Try another search.
             </p>
-        `;
-        return;
-    }
+        `
+        : renderMovieGrid(movies);
 
     resultsContainer.innerHTML = `
-        ${renderMovieGrid(movies)}
+        ${movieResults}
 
         ${showLoadMore ? `
             <div class="text-center py-6">

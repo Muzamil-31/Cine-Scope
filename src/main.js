@@ -142,13 +142,18 @@ async function renderApp() {
                 </p>
 
                 <button
-                    onclick="location.reload()"
+                    id="retryButton"
+                    type="button"
                     class="mt-5 bg-red-600 px-5 py-2 rounded-lg"
                 >
                     Retry
                 </button>
             </div>
         `;
+
+        document
+            .getElementById("retryButton")
+            ?.addEventListener("click", renderApp);
     }
 }
 

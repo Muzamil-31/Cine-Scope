@@ -8,6 +8,9 @@ export function renderMovieCard(movie, isCarousel = false) {
     const year = movie.release_date
         ? movie.release_date.split("-")[0]
         : "N/A";
+    const posterUrl = movie.poster_path
+        ? IMAGE_URL + movie.poster_path
+        : "https://placehold.co/500x750?text=No+Poster";
     const layoutClass = isCarousel
         ? "min-w-[160px] md:min-w-[200px] shrink-0"
         : "w-full min-w-0";
@@ -24,7 +27,7 @@ export function renderMovieCard(movie, isCarousel = false) {
             >
 
                 <img
-                    src="${movie.poster_path ? IMAGE_URL + movie.poster_path : ""}"
+                    src="${posterUrl}"
                     alt="${movie.title}"
                     loading="lazy"
                     class="w-full h-[230px] md:h-[280px] object-cover group-hover:scale-105 transition-transform duration-300"
@@ -92,12 +95,14 @@ export function initializeMovieCards(movies) {
 
         if (!movie) return;
 
-        const added = addToWatchlist(movie);
+        const result = addToWatchlist(movie);
 
-        if (added) {
+        if (result === "added") {
             alert("Movie added to Watchlist!");
-        } else {
+        } else if (result === "duplicate") {
             alert("Movie is already in your Watchlist.");
+        } else {
+            alert("Could not save the movie to your Watchlist.");
         }
     });
 }

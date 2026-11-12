@@ -8,6 +8,7 @@ const app = document.getElementById("app");
 
 const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 const BACKDROP_URL = "https://image.tmdb.org/t/p/original";
+const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
 
 // Get movie ID from URL
 const params = new URLSearchParams(window.location.search);
@@ -66,7 +67,7 @@ async function renderMovieDetails() {
 
                             <!-- Poster -->
                             <img
-                                src="${movie.poster_path ? IMAGE_URL + movie.poster_path : ""}"
+                                src="${movie.poster_path ? IMAGE_URL + movie.poster_path : NO_POSTER_URL}"
                                 alt="${movie.title}"
                                 class="w-64 rounded-xl shadow-2xl"
                             >
@@ -163,12 +164,14 @@ async function renderMovieDetails() {
         // Add movie to watchlist
         document.getElementById("addWatchlist").addEventListener("click", () => {
 
-            const added = addToWatchlist(movie);
+            const result = addToWatchlist(movie);
 
-            if (added) {
+            if (result === "added") {
                 alert("Movie added to watchlist!");
-            } else {
+            } else if (result === "duplicate") {
                 alert("Movie is already in your watchlist.");
+            } else {
+                alert("Could not save the movie to your watchlist.");
             }
 
         });
@@ -176,6 +179,10 @@ async function renderMovieDetails() {
     } catch (error) {
 
         console.error("Movie Details Error:", error);
+        const errorMessage = error.message === "Invalid movie ID." ||
+            error.message === "Movie ID not found"
+            ? "The movie ID is invalid or missing."
+            : "Please check your internet connection and try again.";
 
         app.innerHTML = `
             <div class="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center">
@@ -184,7 +191,7 @@ async function renderMovieDetails() {
                 </h2>
 
                 <p class="text-gray-400">
-                    Please check your internet connection and try again.
+                    ${errorMessage}
                 </p>
 
                 <a href="index.html" class="bg-red-600 px-5 py-2 rounded-lg mt-5">

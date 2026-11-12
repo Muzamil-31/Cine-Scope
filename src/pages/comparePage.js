@@ -12,6 +12,7 @@ let movies = [];
 let selectedMovies = [null, null];
 
 const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
+const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
 
 // Render the comparison page
 function renderPage() {
@@ -143,7 +144,7 @@ async function handleMovieSelection(event) {
     document.getElementById(`selectedMovie${index}`).innerHTML = `
         <div class="flex gap-4 items-center">
             <img
-                src="${movie.poster_path ? IMAGE_URL + movie.poster_path : ""}"
+                src="${movie.poster_path ? IMAGE_URL + movie.poster_path : NO_POSTER_URL}"
                 alt="${movie.title}"
                 class="w-20 rounded-lg"
             >
