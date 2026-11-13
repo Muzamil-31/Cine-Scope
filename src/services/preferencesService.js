@@ -1,3 +1,4 @@
+
 const STORAGE_KEY = "cinescope_preferences";
 
 const DEFAULT_PREFERENCES = {
@@ -66,7 +67,6 @@ export function savePreferredGenres(genres) {
     if (!Array.isArray(genres)) return false;
 
     const preferences = getPreferences();
-
     preferences.preferredGenres = genres;
 
     return savePreferences(preferences);
@@ -88,7 +88,6 @@ export function addRecentlyViewed(movie) {
     );
 
     preferences.recentlyViewed.unshift(movie);
-
     preferences.recentlyViewed = preferences.recentlyViewed.slice(0, 5);
 
     return savePreferences(preferences);
@@ -104,7 +103,6 @@ export function saveTheme(theme) {
     if (!["dark", "light"].includes(theme)) return false;
 
     const preferences = getPreferences();
-
     preferences.theme = theme;
 
     return savePreferences(preferences);
@@ -115,20 +113,7 @@ export function getTheme() {
     return getPreferences().theme;
 }
 
- // Toggle between dark and light themes
-export function toggleTheme() {
-    const newTheme = getTheme() === "dark" ? "light" : "dark";
-
-    saveTheme(newTheme);
-
-    document.documentElement.classList.toggle(
-        "dark",
-        newTheme === "dark"
-    );
-
-    return newTheme;
-}
-
+// Apply saved theme
 export function initializeTheme() {
     const theme = getTheme();
 
@@ -138,4 +123,20 @@ export function initializeTheme() {
     );
 
     return theme;
+}
+
+// Toggle theme
+export function toggleTheme() {
+    const newTheme = getTheme() === "dark" ? "light" : "dark";
+
+    const saved = saveTheme(newTheme);
+
+    if (!saved) return getTheme();
+
+    document.documentElement.classList.toggle(
+        "dark",
+        newTheme === "dark"
+    );
+
+    return newTheme;
 }

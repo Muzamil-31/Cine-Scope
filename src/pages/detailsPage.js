@@ -2,9 +2,17 @@
 import { getMovieDetails } from "../services/movieDetailsService.js";
 import { renderMovieGrid } from "../components/movieGrid.js";
 import { addToWatchlist } from "../storage/storageService.js";
-import { addRecentlyViewed } from "../services/preferencesService.js";
+import {
+    addRecentlyViewed,
+    initializeTheme
+} from "../services/preferencesService.js";
+import {
+    initializeThemeToggle,
+    renderPageHeader
+} from "../components/themeToggle.js";
 
 const app = document.getElementById("app");
+initializeTheme();
 
 const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 const BACKDROP_URL = "https://image.tmdb.org/t/p/original";
@@ -44,6 +52,8 @@ async function renderMovieDetails() {
         const genres = movie.genres || [];
 
         app.innerHTML = `
+            ${renderPageHeader()}
+
             <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
 
                 <!-- Backdrop -->
@@ -157,6 +167,8 @@ async function renderMovieDetails() {
             </main>
         `;
 
+        initializeThemeToggle();
+
         // Add movie to watchlist
         document.getElementById("addWatchlist").addEventListener("click", () => {
             const result = addToWatchlist(movie);
@@ -180,6 +192,7 @@ async function renderMovieDetails() {
                 : "Please check your internet connection and try again.";
 
         app.innerHTML = `
+            ${renderPageHeader()}
             <div class="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white flex flex-col items-center justify-center">
 
                 <h2 class="text-3xl font-bold mb-3">
@@ -196,6 +209,7 @@ async function renderMovieDetails() {
 
             </div>
         `;
+        initializeThemeToggle();
     }
 }
 

@@ -5,8 +5,14 @@ import {
 } from "../services/movieApi.js";
 
 import { getMovieDetails } from "../services/movieDetailsService.js";
+import { initializeTheme } from "../services/preferencesService.js";
+import {
+    initializeThemeToggle,
+    renderPageHeader
+} from "../components/themeToggle.js";
 
 const app = document.getElementById("app");
+initializeTheme();
 
 let movies = [];
 let selectedMovies = [null, null];
@@ -17,20 +23,17 @@ const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
 // Render the comparison page
 function renderPage() {
     app.innerHTML = `
-        <main class="bg-gray-950 text-white min-h-screen">
+        ${renderPageHeader()}
+
+        <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
 
             <div class="max-w-6xl mx-auto px-5 py-10">
-
-                <a href="index.html"
-                    class="text-gray-400 hover:text-white">
-                    ← Back to Home
-                </a>
 
                 <h1 class="text-3xl font-bold text-center mt-6 mb-3">
                     Movie Comparison
                 </h1>
 
-                <p class="text-gray-400 text-center mb-10">
+                <p class="text-gray-600 dark:text-gray-400 text-center mb-10">
                     Select two movies and compare their details.
                 </p>
 
@@ -45,13 +48,14 @@ function renderPage() {
         </main>
     `;
 
+    initializeThemeToggle();
     initializeSearch();
 }
 
 // Render one movie selector
 function renderMovieSelector(index) {
     return `
-        <div class="bg-gray-900 border border-gray-800 p-5 rounded-xl">
+        <div class="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 rounded-xl">
 
             <h2 class="text-xl font-semibold mb-4">
                 Movie ${index + 1}
@@ -61,7 +65,7 @@ function renderMovieSelector(index) {
                 type="text"
                 id="movieSearch${index}"
                 placeholder="Search movie title..."
-                class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 border border-gray-700 outline-none focus:border-red-500"
+                class="w-full p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-700 outline-none focus:border-red-500"
                 autocomplete="off"
             >
 
@@ -102,14 +106,14 @@ function initializeSearch() {
                         type="button"
                         data-movie-id="${movie.id}"
                         data-index="${i}"
-                        class="w-full text-left p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition">
+                        class="w-full text-left p-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition">
                         ${movie.title}
-                        <span class="text-gray-400 text-sm">
+                        <span class="text-gray-600 dark:text-gray-400 text-sm">
                             (${movie.release_date?.slice(0, 4) || "N/A"})
                         </span>
                     </button>
                 `).join("")
-                : `<p class="text-gray-400 p-3">No movies found.</p>`;
+                : `<p class="text-gray-600 dark:text-gray-400 p-3">No movies found.</p>`;
         });
     }
 
@@ -154,7 +158,7 @@ async function handleMovieSelection(event) {
             <div>
                 <h3 class="font-semibold">${movie.title}</h3>
 
-                <p class="text-gray-400 text-sm">
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
                     ${movie.release_date?.slice(0, 4) || "N/A"}
                 </p>
             </div>
@@ -174,7 +178,7 @@ async function compareMovies() {
     const result = document.getElementById("comparisonResult");
 
     result.innerHTML = `
-        <p class="text-center text-gray-400">
+        <p class="text-center text-gray-600 dark:text-gray-400">
             Loading comparison...
         </p>
     `;
@@ -223,11 +227,11 @@ function renderComparison(movie1, movie2) {
             Comparison Results
         </h2>
 
-        <div class="overflow-x-auto rounded-xl border border-gray-800">
+        <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
 
             <table class="w-full text-left">
 
-                <thead class="bg-gray-900">
+                <thead class="bg-gray-100 dark:bg-gray-900">
                     <tr>
                         <th class="p-4">Details</th>
                         <th class="p-4">${movie1.title}</th>
@@ -237,10 +241,10 @@ function renderComparison(movie1, movie2) {
 
                 <tbody>
                     ${rows.map(row => `
-                        <tr class="border-t border-gray-800 hover:bg-gray-900/70">
+                        <tr class="border-t border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900/70">
                             <td class="p-4 font-semibold">${row[0]}</td>
-                            <td class="p-4 text-gray-300">${row[1]}</td>
-                            <td class="p-4 text-gray-300">${row[2]}</td>
+                            <td class="p-4 text-gray-700 dark:text-gray-300">${row[1]}</td>
+                            <td class="p-4 text-gray-700 dark:text-gray-300">${row[2]}</td>
                         </tr>
                     `).join("")}
                 </tbody>
@@ -255,12 +259,14 @@ function renderComparison(movie1, movie2) {
 async function initializeComparison() {
     try {
         app.innerHTML = `
-            <main class="bg-gray-950 text-white min-h-screen">
-                <p class="text-center text-gray-400 p-10">
+            ${renderPageHeader()}
+            <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
+                <p class="text-center text-gray-600 dark:text-gray-400 p-10">
                     Loading movies...
                 </p>
             </main>
         `;
+        initializeThemeToggle();
 
         const [popular, trending] = await Promise.all([
             getPopularMovies(),
@@ -279,12 +285,14 @@ async function initializeComparison() {
         console.error("Movie Loading Error:", error);
 
         app.innerHTML = `
-            <main class="bg-gray-950 text-white min-h-screen">
+            ${renderPageHeader()}
+            <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
                 <p class="text-center text-red-400 p-10">
                     Failed to load movies. Please refresh the page.
                 </p>
             </main>
         `;
+        initializeThemeToggle();
     }
 }
 

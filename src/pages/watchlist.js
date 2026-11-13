@@ -6,11 +6,14 @@ import {
     removeFromWatchlist,
     toggleWatched
 } from "../storage/storageService.js";
+import { initializeTheme } from "../services/preferencesService.js";
+import {
+    initializeThemeToggle,
+    renderPageHeader
+} from "../components/themeToggle.js";
 
 const app = document.getElementById("app");
-
-// Force dark mode on this page
-document.documentElement.classList.add("dark");
+initializeTheme();
 
 function renderWatchlist() {
     const movies = getWatchlist();
@@ -19,13 +22,11 @@ function renderWatchlist() {
     const watchedMovies = movies.filter(movie => movie.watched);
 
     app.innerHTML = `
-        <main class="bg-gray-950 text-white min-h-screen p-5">
+        ${renderPageHeader()}
+
+        <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen p-5">
 
             <div class="max-w-7xl mx-auto">
-
-                <a href="index.html" class="text-red-500 hover:text-red-400">
-                    ← Back to Home
-                </a>
 
                 <h1 class="text-3xl font-bold my-6">
                     My Watchlist
@@ -52,7 +53,7 @@ function renderWatchlist() {
         data-action="unwatched"
         data-id="${movie.id}"
         class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
-        Mark Unwatched
+        Unwatched
     </button>
 
     <button
@@ -68,7 +69,7 @@ function renderWatchlist() {
 
                             </div>
                         `
-                        : '<p class="text-gray-400">No unwatched movies.</p>'
+                        : '<p class="text-gray-600 dark:text-gray-400">No unwatched movies.</p>'
                     }
 
                 </section>
@@ -93,8 +94,8 @@ function renderWatchlist() {
     <button
         data-action="unwatched"
         data-id="${movie.id}"
-        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
-        Mark Unwatched
+        class="w-full bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-2 py-2 rounded">
+        Watched
     </button>
 
     <button
@@ -110,7 +111,7 @@ function renderWatchlist() {
 
                             </div>
                         `
-                        : '<p class="text-gray-400">No watched movies.</p>'
+                        : '<p class="text-gray-600 dark:text-gray-400">No watched movies.</p>'
                     }
 
                 </section>
@@ -119,6 +120,8 @@ function renderWatchlist() {
 
         </main>
     `;
+
+    initializeThemeToggle();
 }
 
 // Handle watchlist actions
