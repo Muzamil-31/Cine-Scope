@@ -27,13 +27,13 @@ Movie detail URLs can be shared or refreshed using the movie ID.
 
 ## Quick QA Checklist
 
-- [ ] Search for a movie, clear the search, and try a search with no matches.
-- [ ] Open a movie, add it to the watchlist, mark it as watched, and remove it.
-- [ ] Test a missing or invalid movie ID, such as `details.html?id=not-a-number`.
-- [ ] Test the navigation menu and search controls on mobile screens.
-- [ ] Check that pages fit without unwanted horizontal scrolling.
-- [ ] Disable network access and confirm the application displays an error message.
-- [ ] Check a movie without a poster and confirm the fallback image appears.
+- Search for a movie, clear the search, and try a search with no matches.
+- Open a movie, add it to the watchlist, mark it as watched, and remove it.
+- Test a missing or invalid movie ID, such as `details.html?id=not-a-number`.
+- Test the navigation menu and search controls on mobile screens.
+- Check that pages fit without unwanted horizontal scrolling.
+- Disable network access and confirm the application displays an error message.
+-  Check a movie without a poster and confirm the fallback image appears.
 
 ## Data Storage
 
@@ -51,7 +51,19 @@ For deployment:
 - Ensure that JavaScript modules and assets are served correctly.
 - Verify that direct movie detail URLs, such as `details.html?id=<movie-id>`, work correctly.
 
-Deployment is not currently configured in this repository because no hosting provider has been selected.
+Deployment is not currently configured in this repository because no hosting provider has been selected.## Deployment
+
+CineScope is deployed on **Vercel** and is accessible through a live URL.
+
+The application is hosted as a static web application using HTML, Tailwind CSS, and Vanilla JavaScript ES Modules.
+
+For deployment:
+- Hosted on Vercel.
+- JavaScript ES Modules and static assets are served through Vercel.
+- Multiple HTML pages are supported.
+- Movie details pages use URL query parameters, such as `details.html?id=<movie-id>`.
+
+Live Demo: https://cine-scope-sage-ten.vercel.app/ .
 
 ---
 

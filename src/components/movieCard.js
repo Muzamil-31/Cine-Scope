@@ -47,7 +47,7 @@ export function renderMovieCard(movie, isCarousel = false) {
 
                     <div class="flex justify-between items-center mt-2 text-sm text-gray-600 dark:text-gray-400">
                         <span>${year}</span>
-                        <span>⭐ ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+                        <span><i class="fa-solid fa-star" style="color: rgb(255, 212, 59);"></i> ${movie.vote_average?.toFixed(1) || "N/A"}</span>
                     </div>
 
                 </div>

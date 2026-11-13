@@ -1,7 +1,6 @@
 const BASE_URL = "https://api.themoviedb.org/3";
 
-// Use a newly generated token.
-// Do not commit your token to GitHub.
+// API Token
 const API_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMmY1NWQ5NWY5NzEwNTc4OTg3YTdiZjhlYmE4ZWFmYiIsIm5iZiI6MTc5NDQ2MzU4NC43OTcsInN1YiI6IjZhZjU1NzYwZmJiNmFkY2Y0MmUyOGY0OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.yb-P7dTXcGBxHzWrBiJpBtNPE-Dde34fKg_9Jbr5NXc";
 
 // Common API request function

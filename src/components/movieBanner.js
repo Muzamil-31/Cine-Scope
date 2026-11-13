@@ -53,10 +53,10 @@ export function renderMovieBanner(movies, genres = []) {
 
                                     <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-200 mb-3">
                                         <span>${year}</span>
-                                        <span>•</span>
-                                        <span>${runtime}</span>
-                                        <span>•</span>
-                                        <span>Rating ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+                                        
+                                        <span><i class="fa-solid fa-clock"></i> ${runtime}</span>
+                                    
+                                        <span><i class="fa-solid fa-star" style="color: rgb(255, 212, 59);"></i>  ${movie.vote_average?.toFixed(1) || "N/A"}</span>
                                     </div>
 
                                     <p class="text-red-400 text-sm font-semibold mb-3">

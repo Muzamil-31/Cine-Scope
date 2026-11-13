@@ -1,24 +1,17 @@
-
 import { renderNavbar, initializeNavbar } from "../components/navbar.js";
-
 import {
     renderMovieBanner,
     initializeMovieBanner
 } from "../components/movieBanner.js";
-
 import { getState, setState } from "../state/appState.js";
-
 import {
     renderMovieSection,
     initializeMovieSections
 } from "../components/movieSection.js";
-
 import { renderSearchBar } from "../components/searchBar.js";
 import { initializeSearchFilters } from "../components/searchResults.js";
 import { initializeMovieCards } from "../components/movieCard.js";
-
 import { renderFooter } from "../components/footer.js";
-
 import {
     getTrendingMovies,
     getPopularMovies,

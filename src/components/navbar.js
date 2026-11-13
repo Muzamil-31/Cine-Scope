@@ -21,7 +21,7 @@ export function renderNavbar() {
                         data-theme-toggle
                         class="bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg"
                     >
-                        Light Mode
+                        <i class="fa-solid fa-moon"></i>
                     </button>
                 </div>
 
@@ -93,7 +93,7 @@ export function renderNavbar() {
                         data-theme-toggle
                         class="text-left bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg"
                     >
-                        Light Mode
+                        <i class="fa-solid fa-moon"></i>
                     </button>
 
                     <img

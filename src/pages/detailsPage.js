@@ -62,7 +62,7 @@ async function renderMovieDetails() {
                     style="background-image: url('${movie.backdrop_path ? BACKDROP_URL + movie.backdrop_path : ""}')"
                 >
 
-                    <div class="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/80 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r  to-transparent"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent"></div>
 
                     <div class="relative max-w-7xl mx-auto px-6 py-12">
@@ -88,9 +88,9 @@ async function renderMovieDetails() {
                                 </h1>
 
                                 <div class="flex flex-wrap gap-5 text-gray-300 mb-5">
-                                    <span>${movie.release_date || "N/A"}</span>
-                                    <span>⏱ ${movie.runtime || "N/A"} min</span>
-                                    <span>⭐ ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+                                    <span>Date : ${movie.release_date || "N/A"}</span>
+                                    <span><i class="fa-solid fa-clock" style="color: rgb(211, 208, 208);"></i> ${movie.runtime || "N/A"} min</span>
+                                    <span><i class="fa-solid fa-star" style="color: rgb(255, 212, 59);"></i> ${movie.vote_average?.toFixed(1) || "N/A"}</span>
                                 </div>
 
                                 <div class="flex flex-wrap gap-2 mb-6">
