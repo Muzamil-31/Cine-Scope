@@ -7,7 +7,7 @@ export async function fetchMovies(endpoint, signal) {
     });
 
     const response = await fetch(
-        `https://your-cinescope-api.vercel.app/api/movies?${params}`,
+        `http://localhost:3000/api/movies?${params}`,
         { signal }
     );
 
