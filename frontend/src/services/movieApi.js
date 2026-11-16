@@ -7,9 +7,9 @@ export async function fetchMovies(endpoint, signal) {
     });
 
     const response = await fetch(
-    `https://cine-scope-zlq8-odot50ol5-oblongpens-projects.vercel.app/api/movies?${params}`,
-    { signal }
-);
+        `http://localhost:3000/api/movies?${params}`,
+        { signal }
+    );
 
     // Check HTTP errors
     if (!response.ok) {
