@@ -19,7 +19,7 @@ The application uses JavaScript ES Modules, so it must be opened through a local
 | Page | Description |
 |---|---|
 | `index.html` | Browse and search movies |
-| `details.html?id=<movie-id>` | View detailed movie information |
+| `details.html` | View detailed movie information |
 | `watchlist.html` | Manage saved movies |
 | `compare.html` | Compare selected movies |
 
@@ -33,7 +33,7 @@ Movie detail URLs can be shared or refreshed using the movie ID.
 - Test the navigation menu and search controls on mobile screens.
 - Check that pages fit without unwanted horizontal scrolling.
 - Disable network access and confirm the application displays an error message.
--  Check a movie without a poster and confirm the fallback image appears.
+- Check a movie without a poster and confirm the fallback image appears.
 
 ## Data Storage
 

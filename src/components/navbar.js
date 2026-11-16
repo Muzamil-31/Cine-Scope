@@ -21,11 +21,12 @@ export function renderNavbar() {
                         data-theme-toggle
                         class="bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg"
                     >
-                        <i class="fa-solid fa-moon"></i>
+                        <i class="fa-regular fa-moon"></i>
                     </button>
                 </div>
 
                 <div class="hidden md:flex items-center gap-3">
+                
                     <input
                         type="text"
                         id="movieSearch"
@@ -33,11 +34,7 @@ export function renderNavbar() {
                         class="w-48 lg:w-56 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 px-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-red-500"
                     >
 
-                    <img
-                        src="https://i.pravatar.cc/101"
-                        alt="Profile"
-                        class="w-10 h-10 rounded-full object-cover"
-                    >
+                   
                 </div>
 
                 <div class="flex md:hidden items-center gap-2">
@@ -50,7 +47,7 @@ export function renderNavbar() {
                         aria-expanded="false"
                         aria-label="Search"
                     >
-                        Search
+                        <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
 
                     <button
@@ -61,7 +58,7 @@ export function renderNavbar() {
                         aria-expanded="false"
                         aria-label="Menu"
                     >
-                        ☰
+                        <i class="fa-solid fa-bars" ></i>
                     </button>
 
                 </div>
@@ -95,12 +92,6 @@ export function renderNavbar() {
                     >
                         <i class="fa-solid fa-moon"></i>
                     </button>
-
-                    <img
-                        src="https://i.pravatar.cc/101"
-                        alt="Profile"
-                        class="w-10 h-10 rounded-full object-cover"
-                    >
 
                 </div>
             </div>

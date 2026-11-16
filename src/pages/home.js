@@ -20,7 +20,9 @@ import {
     getMovieGenres,
     getMovieRuntime
 } from "../services/movieApi.js";
-
+import {
+    getRecentlyViewed
+} from "../services/preferencesService.js";
 const app = document.getElementById("app");
 
 export async function renderHome() {
@@ -58,7 +60,7 @@ export async function renderHome() {
                 }
             })
         );
-
+const recentlyViewed = getRecentlyViewed();
         // Combine movies and remove duplicates
         const allMovies = [
             ...new Map([
@@ -98,12 +100,19 @@ export async function renderHome() {
 
                     <div id="searchResults" class="w-full px-3 sm:px-5 md:px-8"></div>
 
-                    <div id="homeSections" class="w-full">
-                        ${renderMovieSection("Trending Movies", trendingMovies)}
-                        ${renderMovieSection("Popular Movies", popularMovies)}
-                        ${renderMovieSection("Top Rated Movies", topRatedMovies)}
-                        ${renderMovieSection("Upcoming Movies", upcomingMovies)}
-                    </div>
+                   <div id="homeSections" class="w-full">
+
+    ${recentlyViewed.length
+        ? renderMovieSection("Recently Viewed", recentlyViewed)
+        : ""
+    }
+
+    ${renderMovieSection("Trending Movies", trendingMovies)}
+    ${renderMovieSection("Popular Movies", popularMovies)}
+    ${renderMovieSection("Top Rated Movies", topRatedMovies)}
+    ${renderMovieSection("Upcoming Movies", upcomingMovies)}
+
+</div>
 
                 </main>
 

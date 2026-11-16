@@ -27,23 +27,21 @@ export function renderMovieBanner(movies, genres = []) {
                         .filter(Boolean)
                         .join(", ");
 
+                    const backdrop = movie.backdrop_path
+                        ? IMAGE_URL + movie.backdrop_path
+                        : "";
+
                     return `
                         <div
                             class="relative min-w-full h-full bg-cover bg-top flex items-end text-white"
-                            style="
-                                background-image:
-                                    linear-gradient(
-                                        to top,
-                                        rgba(3, 7, 18, 0.95) 0%,
-                                        rgba(3, 7, 18, 0.65) 35%,
-                                        rgba(3, 7, 18, 0.25) 65%,
-                                        rgba(3, 7, 18, 0.10) 100%
-                                    ),
-                                    url('${movie.backdrop_path ? IMAGE_URL + movie.backdrop_path : ""}');
-                            "
+                            style="background-image: url('${backdrop}')"
                         >
 
-                            <div class="w-full px-4 pb-16 sm:px-8 sm:pb-20 md:px-12 md:pb-24">
+                            <!-- Background gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-950/95 via-gray-950/65 to-gray-950/10"></div>
+
+                            <!-- Movie content -->
+                            <div class="relative z-10 w-full px-4 pb-16 sm:px-8 sm:pb-20 md:px-12 md:pb-24">
 
                                 <div class="max-w-2xl">
 
@@ -52,11 +50,19 @@ export function renderMovieBanner(movies, genres = []) {
                                     </h2>
 
                                     <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-200 mb-3">
+
                                         <span>${year}</span>
-                                        
-                                        <span><i class="fa-solid fa-clock"></i> ${runtime}</span>
-                                    
-                                        <span><i class="fa-solid fa-star" style="color: rgb(255, 212, 59);"></i>  ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+
+                                        <span>
+                                            <i class="fa-solid fa-clock"></i>
+                                            ${runtime}
+                                        </span>
+
+                                        <span>
+                                            <i class="fa-solid fa-star text-yellow-400"></i>
+                                            ${movie.vote_average?.toFixed(1) || "N/A"}
+                                        </span>
+
                                     </div>
 
                                     <p class="text-red-400 text-sm font-semibold mb-3">
@@ -71,6 +77,7 @@ export function renderMovieBanner(movies, genres = []) {
 
                                         <button
                                             type="button"
+                                            onclick="window.location.href='details.html?id=${movie.id}'"
                                             class="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition"
                                         >
                                             Watch Now
@@ -78,6 +85,7 @@ export function renderMovieBanner(movies, genres = []) {
 
                                         <button
                                             type="button"
+                                            onclick="window.location.href='details.html?id=${movie.id}'"
                                             class="bg-white/20 hover:bg-white/30 text-white border border-white/30 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition"
                                         >
                                             More Info
@@ -87,15 +95,17 @@ export function renderMovieBanner(movies, genres = []) {
 
                                 </div>
                             </div>
+
                         </div>
                     `;
                 }).join("")}
 
             </div>
 
+            <!-- Slide indicators -->
             <div class="absolute bottom-5 right-4 sm:right-8 flex items-center gap-2 z-20">
 
-                ${bannerMovies.map((movie, index) => `
+                ${bannerMovies.map((index) => `
                     <div
                         class="banner-indicator h-2 rounded-full transition-all duration-500
                         ${index === 0 ? "w-8 bg-red-600" : "w-2 bg-white/60"}"
@@ -108,6 +118,8 @@ export function renderMovieBanner(movies, genres = []) {
     `;
 }
 
+
+// Initialize automatic banner slider
 export function initializeMovieBanner() {
 
     const track = document.getElementById("bannerTrack");

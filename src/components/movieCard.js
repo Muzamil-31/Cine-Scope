@@ -3,6 +3,52 @@ import { addToWatchlist } from "../storage/storageService.js";
 
 const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
+// Toast notification
+let toastTimer;
+
+function showToast(message, isError = false) {
+
+    let toast = document.getElementById("toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+
+        toast.className = `
+            fixed top-5 left-1/2 -translate-x-1/2 z-50
+            bg-gray-900 text-white
+            px-5 py-3 rounded-lg shadow-lg
+            min-w-[280px]
+            transition-opacity duration-300
+        `;
+
+        document.body.appendChild(toast);
+    }
+
+    const title = isError ? "Watchlist Error" : "Added to Watchlist";
+
+    toast.innerHTML = `
+        <div class="flex items-center gap-2 font-semibold">
+            <i class="fa-solid ${isError ? "fa-circle-xmark text-red-500" : "fa-circle-check text-green-500"}"></i>
+            ${title}
+        </div>
+
+        <p class="text-xs text-gray-300 mt-1 ml-6">
+            ${message}
+        </p>
+    `;
+
+    toast.classList.remove("opacity-0");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+        toast.classList.add("opacity-0");
+
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
 export function renderMovieCard(movie, isCarousel = false) {
 
     const year = movie.release_date
@@ -100,11 +146,11 @@ export function initializeMovieCards(movies) {
         const result = addToWatchlist(movie);
 
         if (result === "added") {
-            alert("Movie added to Watchlist!");
+            showToast("Movie added to Watchlist!");
         } else if (result === "duplicate") {
-            alert("Movie is already in your Watchlist.");
+            showToast("Movie is already in your Watchlist.", true);
         } else {
-            alert("Could not save the movie to your Watchlist.");
+            showToast("Could not save the movie to your Watchlist.", true);
         }
     });
 }

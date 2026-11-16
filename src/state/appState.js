@@ -1,5 +1,4 @@
 const state = {
-
     // Homepage movies
     trendingMovies: [],
     popularMovies: [],

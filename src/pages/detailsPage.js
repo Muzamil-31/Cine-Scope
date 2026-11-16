@@ -1,6 +1,7 @@
 
 import { getMovieDetails } from "../services/movieDetailsService.js";
 import { renderMovieGrid } from "../components/movieGrid.js";
+import { initializeMovieCards } from "../components/movieCard.js";
 import { addToWatchlist } from "../storage/storageService.js";
 import {
     addRecentlyViewed,
@@ -10,20 +11,84 @@ import {
     initializeThemeToggle,
     renderPageHeader
 } from "../components/themeToggle.js";
+import {
+    IMAGE_URL,
+    NO_POSTER_URL,
+    BACKDROP_URL
+} from "../config/imageConfig.js";
 
 const app = document.getElementById("app");
+
 initializeTheme();
 
-const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
-const BACKDROP_URL = "https://image.tmdb.org/t/p/original";
-const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
+// Toast notification
+let toastTimer;
+
+function showToast(message, isError = false) {
+
+    let toast = document.getElementById("toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+
+        toast.className = `
+            fixed top-5 left-1/2 -translate-x-1/2 z-50
+            bg-gray-900 text-white
+            px-5 py-3 rounded-lg shadow-lg
+            min-w-[280px]
+            transition-opacity duration-300
+        `;
+
+        document.body.appendChild(toast);
+    }
+
+    toast.innerHTML = `
+        <div class="flex items-center gap-2 font-semibold">
+            <i class="fa-solid ${
+                isError
+                    ? "fa-circle-xmark text-red-500"
+                    : "fa-circle-check text-green-500"
+            }"></i>
+
+            ${isError ? "Watchlist Error" : "Added to Watchlist"}
+        </div>
+
+        <p class="text-xs text-gray-300 mt-1 ml-6">
+            ${message}
+        </p>
+    `;
+
+    toast.classList.remove("opacity-0");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+        toast.classList.add("opacity-0");
+
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
+// Convert country codes into country names
+const countryNames = new Intl.DisplayNames(["en"], {
+    type: "region"
+});
+
+// Convert language codes into language names
+const languageNames = new Intl.DisplayNames(["en"], {
+    type: "language"
+});
 
 // Get movie ID from URL
 const params = new URLSearchParams(window.location.search);
 const movieId = params.get("id");
 
+// Render movie details
 async function renderMovieDetails() {
+
     try {
+
         if (!movieId) {
             throw new Error("Movie ID not found");
         }
@@ -51,6 +116,28 @@ async function renderMovieDetails() {
         // Get genres
         const genres = movie.genres || [];
 
+        // Get origin countries
+        const originCountries = movie.origin_country?.length
+            ? movie.origin_country
+                .map(code => countryNames.of(code))
+                .join(", ")
+            : "N/A";
+
+        // Get original language
+        const originalLanguage = movie.original_language
+            ? languageNames.of(movie.original_language)
+            : "N/A";
+
+        // Get spoken languages
+        const spokenLanguages = movie.spoken_languages?.length
+            ? movie.spoken_languages
+                .map(language => language.english_name || language.name)
+                .join(", ")
+            : "N/A";
+
+        // Get movie status
+        const movieStatus = movie.status || "N/A";
+
         app.innerHTML = `
             ${renderPageHeader()}
 
@@ -62,7 +149,8 @@ async function renderMovieDetails() {
                     style="background-image: url('${movie.backdrop_path ? BACKDROP_URL + movie.backdrop_path : ""}')"
                 >
 
-                    <div class="absolute inset-0 bg-gradient-to-r  to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/50 to-transparent"></div>
+
                     <div class="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent"></div>
 
                     <div class="relative max-w-7xl mx-auto px-6 py-12">
@@ -87,20 +175,37 @@ async function renderMovieDetails() {
                                     ${movie.title}
                                 </h1>
 
+                                <!-- Basic Information -->
                                 <div class="flex flex-wrap gap-5 text-gray-300 mb-5">
-                                    <span>Date : ${movie.release_date || "N/A"}</span>
-                                    <span><i class="fa-solid fa-clock" style="color: rgb(211, 208, 208);"></i> ${movie.runtime || "N/A"} min</span>
-                                    <span><i class="fa-solid fa-star" style="color: rgb(255, 212, 59);"></i> ${movie.vote_average?.toFixed(1) || "N/A"}</span>
+
+                                    <span>
+                                        Date : ${movie.release_date || "N/A"}
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-solid fa-clock" style="color: rgb(211, 208, 208);"></i>
+                                        ${movie.runtime || "N/A"} min
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-solid fa-star" style="color: rgb(255, 212, 59);"></i>
+                                        ${movie.vote_average?.toFixed(1) || "N/A"}
+                                    </span>
+
                                 </div>
 
+                                <!-- Genres -->
                                 <div class="flex flex-wrap gap-2 mb-6">
+
                                     ${genres.map(genre => `
                                         <span class="bg-gray-800 px-3 py-1 rounded-full text-sm">
                                             ${genre.name}
                                         </span>
                                     `).join("")}
+
                                 </div>
 
+                                <!-- Overview -->
                                 <h2 class="text-xl font-semibold mb-3">
                                     Overview
                                 </h2>
@@ -109,6 +214,52 @@ async function renderMovieDetails() {
                                     ${movie.overview || "Overview not available."}
                                 </p>
 
+                                <!-- Additional Movie Information -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-7">
+
+                                    <div>
+                                        <p class="text-gray-400 text-sm mb-1">
+                                            Origin Country
+                                        </p>
+
+                                        <p class="font-medium">
+                                            ${originCountries}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-gray-400 text-sm mb-1">
+                                            Original Language
+                                        </p>
+
+                                        <p class="font-medium">
+                                            ${originalLanguage}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-gray-400 text-sm mb-1">
+                                            Spoken Languages
+                                        </p>
+
+                                        <p class="font-medium">
+                                            ${spokenLanguages}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-gray-400 text-sm mb-1">
+                                            Status
+                                        </p>
+
+                                        <p class="font-medium">
+                                            ${movieStatus}
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <!-- Watchlist Button -->
                                 <button
                                     id="addWatchlist"
                                     class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg mt-7"
@@ -169,20 +320,26 @@ async function renderMovieDetails() {
 
         initializeThemeToggle();
 
-        // Add movie to watchlist
+        // Initialize related movie Watchlist buttons
+        initializeMovieCards(relatedMovies);
+
+        // Add main movie to Watchlist
         document.getElementById("addWatchlist").addEventListener("click", () => {
+
             const result = addToWatchlist(movie);
 
             if (result === "added") {
-                alert("Movie added to watchlist!");
+                showToast("The movie was added successfully.");
             } else if (result === "duplicate") {
-                alert("Movie is already in your watchlist.");
+                showToast("This movie is already in your Watchlist.", true);
             } else {
-                alert("Could not save the movie to your watchlist.");
+                showToast("Could not save the movie to your Watchlist.", true);
             }
+
         });
 
     } catch (error) {
+
         console.error("Movie Details Error:", error);
 
         const errorMessage =
@@ -193,6 +350,7 @@ async function renderMovieDetails() {
 
         app.innerHTML = `
             ${renderPageHeader()}
+
             <div class="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white flex flex-col items-center justify-center">
 
                 <h2 class="text-3xl font-bold mb-3">
@@ -209,17 +367,20 @@ async function renderMovieDetails() {
 
             </div>
         `;
+
         initializeThemeToggle();
     }
 }
 
 // Navigate to similar movie details
 document.addEventListener("click", event => {
+
     const card = event.target.closest("[data-movie-id]");
 
     if (card) {
         window.location.href = `details.html?id=${card.dataset.movieId}`;
     }
+
 });
 
 renderMovieDetails();

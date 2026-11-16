@@ -36,7 +36,7 @@ export function initializeThemeToggle() {
     const buttons = document.querySelectorAll("[data-theme-toggle]");
 
     function updateButtons(theme) {
-        const text = theme === "dark" ? "Light Mode" : "Dark Mode";
+        const text = theme === "dark" ? "Light" : "Dark";
         buttons.forEach(button => {
             button.textContent = text;
         });

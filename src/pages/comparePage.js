@@ -1,26 +1,28 @@
 
-import {
-    getPopularMovies,
-    getTrendingMovies
-} from "../services/movieApi.js";
-
+import { getMoviesByTitle } from "../services/movieApi.js";
 import { getMovieDetails } from "../services/movieDetailsService.js";
 import { initializeTheme } from "../services/preferencesService.js";
+import {
+    IMAGE_URL,
+    NO_POSTER_URL, 
+} from "../config/imageConfig.js";
 import {
     initializeThemeToggle,
     renderPageHeader
 } from "../components/themeToggle.js";
 
 const app = document.getElementById("app");
+
 initializeTheme();
 
-let movies = [];
 let selectedMovies = [null, null];
+let searchTimers = [null, null];
+let searchControllers = [null, null];
 
-const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
-const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
+// const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
+// const NO_POSTER_URL = "https://placehold.co/500x750?text=No+Poster";
 
-// Render the comparison page
+// Render comparison page
 function renderPage() {
     app.innerHTML = `
         ${renderPageHeader()}
@@ -50,9 +52,11 @@ function renderPage() {
 
     initializeThemeToggle();
     initializeSearch();
+
+    app.addEventListener("click", handleMovieSelection);
 }
 
-// Render one movie selector
+// Render movie selector
 function renderMovieSelector(index) {
     return `
         <div class="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 rounded-xl">
@@ -65,14 +69,11 @@ function renderMovieSelector(index) {
                 type="text"
                 id="movieSearch${index}"
                 placeholder="Search movie title..."
-                class="w-full p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-700 outline-none focus:border-red-500"
                 autocomplete="off"
+                class="w-full p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 outline-none focus:border-red-500"
             >
 
-            <div
-                id="movieResults${index}"
-                class="mt-3 space-y-2 max-h-60 overflow-y-auto">
-            </div>
+            <div id="movieResults${index}" class="mt-3 space-y-2 max-h-60 overflow-y-auto"></div>
 
             <div id="selectedMovie${index}" class="mt-5"></div>
 
@@ -80,44 +81,89 @@ function renderMovieSelector(index) {
     `;
 }
 
-// Search movies in the loaded movie list
+// Initialize movie search
 function initializeSearch() {
     for (let i = 0; i < 2; i++) {
         const input = document.getElementById(`movieSearch${i}`);
 
         input.addEventListener("input", () => {
-            const searchText = input.value.toLowerCase().trim();
+            clearTimeout(searchTimers[i]);
+            searchControllers[i]?.abort();
+
+            selectedMovies[i] = null;
+
+            document.getElementById(`selectedMovie${i}`).innerHTML = "";
+            document.getElementById("comparisonResult").innerHTML = "";
+
+            const query = input.value.trim();
             const results = document.getElementById(`movieResults${i}`);
 
-            if (!searchText) {
+            if (!query) {
                 results.innerHTML = "";
                 return;
             }
 
-            const filteredMovies = movies
-                .filter(movie =>
-                    movie.title.toLowerCase().includes(searchText)
-                )
-                .slice(0, 10);
+            results.innerHTML = `
+                <p class="text-gray-500 p-3">Searching...</p>
+            `;
 
-            results.innerHTML = filteredMovies.length
-                ? filteredMovies.map(movie => `
-                    <button
-                        type="button"
-                        data-movie-id="${movie.id}"
-                        data-index="${i}"
-                        class="w-full text-left p-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition">
-                        ${movie.title}
-                        <span class="text-gray-600 dark:text-gray-400 text-sm">
-                            (${movie.release_date?.slice(0, 4) || "N/A"})
-                        </span>
-                    </button>
-                `).join("")
-                : `<p class="text-gray-600 dark:text-gray-400 p-3">No movies found.</p>`;
+            // Wait until the user stops typing
+            searchTimers[i] = setTimeout(() => {
+                searchMovies(i, query);
+            }, 500);
         });
     }
+}
 
-    app.addEventListener("click", handleMovieSelection);
+// Search movies from TMDB
+async function searchMovies(index, query) {
+    const results = document.getElementById(`movieResults${index}`);
+
+    const controller = new AbortController();
+    searchControllers[index] = controller;
+
+    try {
+        const data = await getMoviesByTitle(
+            query,
+            1,
+            controller.signal
+        );
+
+        // Ignore outdated results
+        if (
+            controller.signal.aborted ||
+            document.getElementById(`movieSearch${index}`).value.trim() !== query
+        ) return;
+
+        const movies = data.results.slice(0, 10);
+
+        results.innerHTML = movies.length
+            ? movies.map(movie => `
+                <button
+                    type="button"
+                    data-movie-id="${movie.id}"
+                    data-index="${index}"
+                    class="w-full text-left p-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg">
+
+                    ${movie.title}
+
+                    <span class="text-gray-500 text-sm">
+                        (${movie.release_date?.slice(0, 4) || "N/A"})
+                    </span>
+
+                </button>
+            `).join("")
+            : `<p class="text-gray-500 p-3">No movies found.</p>`;
+
+    } catch (error) {
+        if (error.name === "AbortError") return;
+
+        console.error("Movie Search Error:", error);
+
+        results.innerHTML = `
+            <p class="text-red-400 p-3">Failed to search movies.</p>
+        `;
+    }
 }
 
 // Handle movie selection
@@ -126,68 +172,91 @@ async function handleMovieSelection(event) {
 
     if (!button) return;
 
-    const movieId = Number(button.dataset.movieId);
     const index = Number(button.dataset.index);
+    const movieId = Number(button.dataset.movieId);
 
-    const otherMovie = selectedMovies[1 - index];
+    if (selectedMovies[1 - index]?.id === movieId) {
+    showToast("Please select two different movies.");
+    return;
+}
 
-    if (otherMovie?.id === movieId) {
-        alert("Please select two different movies.");
-        return;
-    }
+    const movie = await Promise.resolve(
+        JSON.parse(JSON.stringify(
+            // Find selected movie from displayed search results
+            button.dataset.movieId
+        ))
+    );
 
-    const movie = movies.find(item => item.id === movieId);
+    // Get selected movie from the current search results
+    const input = document.getElementById(`movieSearch${index}`);
+    const query = input.value.trim();
 
-    if (!movie) return;
+    try {
+        const data = await getMoviesByTitle(query, 1);
 
-    selectedMovies[index] = movie;
+        const selectedMovie = data.results.find(
+            item => item.id === movieId
+        );
 
-    document.getElementById(`movieResults${index}`).innerHTML = "";
+        if (!selectedMovie) return;
 
-    document.getElementById(`movieSearch${index}`).value = movie.title;
+        selectedMovies[index] = selectedMovie;
 
-    document.getElementById(`selectedMovie${index}`).innerHTML = `
-        <div class="flex gap-4 items-center">
+        document.getElementById(`movieResults${index}`).innerHTML = "";
+        input.value = selectedMovie.title;
 
-            <img
-                src="${movie.poster_path ? IMAGE_URL + movie.poster_path : NO_POSTER_URL}"
-                alt="${movie.title}"
-                class="w-20 rounded-lg"
-            >
+        document.getElementById(`selectedMovie${index}`).innerHTML = `
+            <div class="flex gap-4 items-center">
 
-            <div>
-                <h3 class="font-semibold">${movie.title}</h3>
+                <img
+                    src="${selectedMovie.poster_path ? IMAGE_URL + selectedMovie.poster_path : NO_POSTER_URL}"
+                    alt="${selectedMovie.title}"
+                    class="w-20 rounded-lg"
+                >
 
-                <p class="text-gray-600 dark:text-gray-400 text-sm">
-                    ${movie.release_date?.slice(0, 4) || "N/A"}
-                </p>
+                <div>
+                    <h3 class="font-semibold">${selectedMovie.title}</h3>
+
+                    <p class="text-gray-500 text-sm">
+                        ${selectedMovie.release_date?.slice(0, 4) || "N/A"}
+                    </p>
+                </div>
+
             </div>
+        `;
 
-        </div>
-    `;
+        if (selectedMovies[0] && selectedMovies[1]) {
+            compareMovies();
+        }
 
-    if (selectedMovies[0] && selectedMovies[1]) {
-        await compareMovies();
-    } else {
-        document.getElementById("comparisonResult").innerHTML = "";
+    } catch (error) {
+        console.error("Movie Selection Error:", error);
     }
 }
 
-// Fetch complete details and compare
+// Compare selected movies
 async function compareMovies() {
     const result = document.getElementById("comparisonResult");
 
+    const firstId = selectedMovies[0].id;
+    const secondId = selectedMovies[1].id;
+
     result.innerHTML = `
-        <p class="text-center text-gray-600 dark:text-gray-400">
+        <p class="text-center text-gray-500">
             Loading comparison...
         </p>
     `;
 
     try {
         const [first, second] = await Promise.all([
-            getMovieDetails(selectedMovies[0].id),
-            getMovieDetails(selectedMovies[1].id)
+            getMovieDetails(firstId),
+            getMovieDetails(secondId)
         ]);
+
+        if (
+            selectedMovies[0]?.id !== firstId ||
+            selectedMovies[1]?.id !== secondId
+        ) return;
 
         renderComparison(first.details, second.details);
 
@@ -196,22 +265,59 @@ async function compareMovies() {
 
         result.innerHTML = `
             <p class="text-center text-red-400">
-                Failed to load movie comparison. Please try again.
+                Failed to load movie comparison.
             </p>
         `;
     }
 }
+// Toast notification
+let toastTimer;
 
-// Display comparison table
+function showToast(message) {
+
+    let toast = document.getElementById("toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+
+        toast.className = `
+            fixed top-5 left-1/2 -translate-x-1/2 z-50
+            bg-gray-900 text-white
+            px-5 py-3 rounded-lg shadow-lg
+            min-w-[280px]
+            transition-opacity duration-300
+        `;
+
+        document.body.appendChild(toast);
+    }
+
+    toast.innerHTML = `
+        <div class="flex items-center gap-2 font-semibold">
+            <i class="fa-solid fa-circle-xmark text-red-500"></i>
+            Invalid Selection
+        </div>
+
+        <p class="text-xs text-gray-300 mt-1 ml-6">
+            ${message}
+        </p>
+    `;
+
+    toast.classList.remove("opacity-0");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+        toast.classList.add("opacity-0");
+
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+// Render comparison table
 function renderComparison(movie1, movie2) {
-    const getYear = movie =>
-        movie.release_date?.slice(0, 4) || "N/A";
-
-    const getRuntime = movie =>
-        movie.runtime ? `${movie.runtime} min` : "N/A";
-
-    const getGenres = movie =>
-        movie.genres?.map(genre => genre.name).join(", ") || "N/A";
+    const getYear = movie => movie.release_date?.slice(0, 4) || "N/A";
+    const getRuntime = movie => movie.runtime ? `${movie.runtime} min` : "N/A";
+    const getGenres = movie => movie.genres?.map(g => g.name).join(", ") || "N/A";
 
     const rows = [
         ["Rating", movie1.vote_average?.toFixed(1) ?? "N/A", movie2.vote_average?.toFixed(1) ?? "N/A"],
@@ -241,7 +347,7 @@ function renderComparison(movie1, movie2) {
 
                 <tbody>
                     ${rows.map(row => `
-                        <tr class="border-t border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900/70">
+                        <tr class="border-t border-gray-200 dark:border-gray-800">
                             <td class="p-4 font-semibold">${row[0]}</td>
                             <td class="p-4 text-gray-700 dark:text-gray-300">${row[1]}</td>
                             <td class="p-4 text-gray-700 dark:text-gray-300">${row[2]}</td>
@@ -255,45 +361,5 @@ function renderComparison(movie1, movie2) {
     `;
 }
 
-// Load movies from TMDB
-async function initializeComparison() {
-    try {
-        app.innerHTML = `
-            ${renderPageHeader()}
-            <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
-                <p class="text-center text-gray-600 dark:text-gray-400 p-10">
-                    Loading movies...
-                </p>
-            </main>
-        `;
-        initializeThemeToggle();
-
-        const [popular, trending] = await Promise.all([
-            getPopularMovies(),
-            getTrendingMovies()
-        ]);
-
-        movies = [
-            ...new Map(
-                [...popular, ...trending].map(movie => [movie.id, movie])
-            ).values()
-        ];
-
-        renderPage();
-
-    } catch (error) {
-        console.error("Movie Loading Error:", error);
-
-        app.innerHTML = `
-            ${renderPageHeader()}
-            <main class="bg-white dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen">
-                <p class="text-center text-red-400 p-10">
-                    Failed to load movies. Please refresh the page.
-                </p>
-            </main>
-        `;
-        initializeThemeToggle();
-    }
-}
-
-initializeComparison();
+// Initialize page
+renderPage();
