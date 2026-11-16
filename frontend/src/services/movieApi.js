@@ -1,17 +1,15 @@
-export const BASE_URL = "https://api.themoviedb.org/3";
 
-// // Add your new TMDB Read Access Token here
-export const API_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMmY1NWQ5NWY5NzEwNTc4OTg3YTdiZjhlYmE4ZWFmYiIsIm5iZiI6MTc5NDQ2MzU4NC43OTcsInN1YiI6IjZhZjU1NzYwZmJiNmFkY2Y0MmUyOGY0OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.yb-P7dTXcGBxHzWrBiJpBtNPE-Dde34fKg_9Jbr5NXc";
-
+// Common API request function
 export async function fetchMovies(endpoint, signal) {
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-        headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${API_TOKEN}`
-        },
-        signal
+    const params = new URLSearchParams({
+        endpoint: endpoint
     });
+
+    const response = await fetch(
+        `http://localhost:3000/api/movies?${params}`,
+        { signal }
+    );
 
     // Check HTTP errors
     if (!response.ok) {
