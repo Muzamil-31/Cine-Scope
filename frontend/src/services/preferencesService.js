@@ -2,12 +2,11 @@
 const STORAGE_KEY = "cinescope_preferences";
 
 const DEFAULT_PREFERENCES = {
-    preferredGenres: [],
     recentlyViewed: [],
     theme: "dark"
 };
 
-// Get preferences safely
+// Get preferences
 function getPreferences() {
     try {
         const storedData = localStorage.getItem(STORAGE_KEY);
@@ -18,19 +17,11 @@ function getPreferences() {
 
         const preferences = JSON.parse(storedData);
 
-        if (
-            !preferences ||
-            typeof preferences !== "object" ||
-            Array.isArray(preferences)
-        ) {
+        if (!preferences || typeof preferences !== "object") {
             return { ...DEFAULT_PREFERENCES };
         }
 
         return {
-            preferredGenres: Array.isArray(preferences.preferredGenres)
-                ? preferences.preferredGenres
-                : [],
-
             recentlyViewed: Array.isArray(preferences.recentlyViewed)
                 ? preferences.recentlyViewed
                 : [],
@@ -46,35 +37,15 @@ function getPreferences() {
     }
 }
 
-// Save preferences safely
+// Save preferences
 function savePreferences(preferences) {
     try {
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(preferences)
-        );
-
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
         return true;
-
     } catch (error) {
         console.error("Failed to save preferences:", error);
         return false;
     }
-}
-
-// Save preferred genres
-export function savePreferredGenres(genres) {
-    if (!Array.isArray(genres)) return false;
-
-    const preferences = getPreferences();
-    preferences.preferredGenres = genres;
-
-    return savePreferences(preferences);
-}
-
-// Get preferred genres
-export function getPreferredGenres() {
-    return getPreferences().preferredGenres;
 }
 
 // Save recently viewed movies
@@ -98,7 +69,7 @@ export function getRecentlyViewed() {
     return getPreferences().recentlyViewed;
 }
 
-// Save theme preference
+// Save theme
 export function saveTheme(theme) {
     if (!["dark", "light"].includes(theme)) return false;
 
@@ -113,14 +84,11 @@ export function getTheme() {
     return getPreferences().theme;
 }
 
-// Apply saved theme
+// Initialize theme
 export function initializeTheme() {
     const theme = getTheme();
 
-    document.documentElement.classList.toggle(
-        "dark",
-        theme === "dark"
-    );
+    document.documentElement.classList.toggle("dark", theme === "dark");
 
     return theme;
 }
@@ -129,14 +97,9 @@ export function initializeTheme() {
 export function toggleTheme() {
     const newTheme = getTheme() === "dark" ? "light" : "dark";
 
-    const saved = saveTheme(newTheme);
+    if (!saveTheme(newTheme)) return getTheme();
 
-    if (!saved) return getTheme();
-
-    document.documentElement.classList.toggle(
-        "dark",
-        newTheme === "dark"
-    );
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
 
     return newTheme;
 }
