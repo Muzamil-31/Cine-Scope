@@ -1,4 +1,3 @@
-
 export function renderSearchBar(genres = [], movies = []) {
 
     // Get all available release years and sort newest first
@@ -11,6 +10,7 @@ export function renderSearchBar(genres = [], movies = []) {
     ].sort((a, b) => Number(b) - Number(a));
 
     const selectClass = `
+        w-full min-w-0
         bg-gray-100 dark:bg-gray-900
         text-gray-900 dark:text-white
         border border-gray-300 dark:border-gray-700
@@ -22,7 +22,7 @@ export function renderSearchBar(genres = [], movies = []) {
     return `
         <section class="p-5">
 
-            <div class="flex flex-wrap gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 
                 <select id="genreFilter" class="${selectClass}">
                     <option value="">All Genres</option>
