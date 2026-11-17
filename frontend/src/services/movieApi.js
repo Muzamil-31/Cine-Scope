@@ -1,3 +1,5 @@
+const API_BASE_URL = "https://cine-scope-mgkn.vercel.app";
+
 
 // Common API request function
 export async function fetchMovies(endpoint, signal) {
@@ -7,9 +9,9 @@ export async function fetchMovies(endpoint, signal) {
     });
 
     const response = await fetch(
-        `http://localhost:3000/api/movies?${params}`,
-        { signal }
-    );
+    `${API_BASE_URL}/api/movies?${params}`,
+    { signal }
+);
 
     // Check HTTP errors
     if (!response.ok) {
